@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import MuseumScrollNavigator from '@/components/museum/MuseumScrollNavigator';
 import PrintingMoneyStream from '@/components/museum/PrintingMoneyStream';
 import ContinuousSpeedConveyor from '@/components/exhibits/ContinuousSpeedConveyor';
 import SoundVsLightShowdown from '@/components/exhibits/SoundVsLightShowdown';
@@ -16,8 +17,11 @@ import { ArrowDown } from 'lucide-react';
 export default function MuseumWalkthrough() {
   return (
     <div className="w-full flex flex-col items-center">
+      {/* Non-distractive Left-Docked Museum Scroll Navigator */}
+      <MuseumScrollNavigator />
+
       {/* 1. Welcoming Hero Entrance */}
-      <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20 sm:pt-36 sm:pb-32 text-center flex flex-col items-center">
+      <section id="entrance" className="scroll-mt-24 w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20 sm:pt-36 sm:pb-32 text-center flex flex-col items-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium text-slate-500 bg-white border border-slate-200 mb-6 shadow-2xs">
           <span>Digital Science Museum</span>
           <span>&bull;</span>
@@ -41,7 +45,7 @@ export default function MuseumWalkthrough() {
       </section>
 
       {/* 2. Hall 01: Real-Time Stream (Neal.fun Printing Money style) */}
-      <section id="realtime-stream" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="realtime-stream" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
             Hall 01 &bull; Real-Time Stream
@@ -57,7 +61,7 @@ export default function MuseumWalkthrough() {
       </section>
 
       {/* 3. Hall 02: Continuous Speed Conveyors (Neal.fun Sell! Sell! Sell! style) */}
-      <section id="speed-conveyor" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="speed-conveyor" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
             Hall 02 &bull; 1:1 True-Scale Speed Tracks
@@ -73,32 +77,32 @@ export default function MuseumWalkthrough() {
       </section>
 
       {/* 4. Special Feature: True-Scale Showdown (Sound vs. Light) */}
-      <section id="sound-vs-light" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="sound-vs-light" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <SoundVsLightShowdown />
       </section>
 
       {/* 5. Special Feature: The Animal Kingdom Speed Olympics */}
-      <section id="animal-olympics" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="animal-olympics" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <AnimalSpeedOlympics />
       </section>
 
       {/* 6. Hall 03: The Scale of Data (Neal.fun / Paper style with rich SVG illustrations) */}
-      <section id="data-scale" className="w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="data-scale" className="scroll-mt-20 w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <DataPaperScale />
       </section>
 
       {/* 7. Hall 04: Inside Your CPU (Why Is Your Computer Waiting?) */}
-      <section id="cpu-dilation" className="w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="cpu-dilation" className="scroll-mt-20 w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <CpuPaperScale />
       </section>
 
       {/* 8. Hall 05: Speed of Light & The Latency Arena */}
-      <section id="latency-arena" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="latency-arena" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <ContinuousLatencyStream />
       </section>
 
       {/* 9. Hall 06: Refresh & Frame Rate Vault */}
-      <section id="framerate-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="framerate-vault" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
             Hall 06 &bull; The Refresh Vault
@@ -114,7 +118,7 @@ export default function MuseumWalkthrough() {
       </section>
 
       {/* 10. Hall 07: The Speed of You (Human Biology) */}
-      <section id="human-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="human-vault" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
             Hall 07 &bull; The Speed of You
@@ -130,7 +134,7 @@ export default function MuseumWalkthrough() {
       </section>
 
       {/* 11. Hall 08: The Cosmic Vault */}
-      <section id="cosmic-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+      <section id="cosmic-vault" className="scroll-mt-20 w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
             Hall 08 &bull; The Cosmic Vault
