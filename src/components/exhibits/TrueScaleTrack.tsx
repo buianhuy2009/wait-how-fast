@@ -320,7 +320,7 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
       </div>
 
       {/* Main Track Interactive Arena */}
-      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
         {/* Track Top Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4 mb-4">
           <div className="flex items-center gap-3">

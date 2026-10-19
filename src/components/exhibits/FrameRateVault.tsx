@@ -236,7 +236,7 @@ export default function FrameRateVault() {
   return (
     <div className="w-full space-y-6">
       {/* Upper Refresh Detector Card */}
-      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm text-slate-900">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs text-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 shadow-2xs">
@@ -342,7 +342,7 @@ export default function FrameRateVault() {
       {/* Explainer Accordions: Why 24 FPS in Cinema vs Gaming */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {FRAMERATE_EXPLAINERS.map((exp, idx) => (
-          <div key={idx} className="p-5 rounded-3xl bg-white border-2 border-slate-200/90 text-xs leading-relaxed space-y-2 shadow-sm">
+          <div key={idx} className="p-6 rounded-3xl bg-white border border-slate-200 text-xs leading-relaxed space-y-2 shadow-xs">
             <h4 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
               <Zap className="w-4 h-4 text-amber-500" />
               {exp.title}

@@ -125,7 +125,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
       </div>
 
       {/* Main Interactive Stage: The CPU Worker Office */}
-      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
         {/* Stage Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-3">

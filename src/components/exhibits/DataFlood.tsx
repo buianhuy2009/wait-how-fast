@@ -175,7 +175,7 @@ export default function DataFlood({
   return (
     <div className="w-full space-y-6">
       {/* Upper Interactive Arena: The Great "b" vs "B" Pipe */}
-      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm text-slate-900">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs text-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-600 shadow-2xs">
@@ -277,7 +277,7 @@ export default function DataFlood({
       </div>
 
       {/* Lower Interactive Arena: "What If 1 Byte Was..." Physical Scaling Engine */}
-      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm text-slate-900">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs text-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 shadow-2xs">
@@ -351,7 +351,7 @@ export default function DataFlood({
 
         {/* 3. Scaled Result Showcase Box */}
         {currentScale && (
-          <div className="relative rounded-3xl p-6 bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/80 border-2 border-indigo-200 shadow-sm overflow-hidden">
+          <div className="relative rounded-3xl p-6 bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/80 border border-indigo-100 shadow-xs overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-indigo-100 pb-4 mb-4">
               <div className="flex items-center gap-3">
                 <span className="text-4xl p-2 rounded-2xl bg-white border border-indigo-100 shadow-2xs">{selectedAnalogy.icon}</span>

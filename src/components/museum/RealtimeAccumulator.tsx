@@ -161,27 +161,27 @@ export default function RealtimeAccumulator() {
   };
 
   return (
-    <div className="w-full bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-xs">
       {/* Top Banner / Ticker Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-slate-100 pb-8 mb-8">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Neal.fun Real-Time Accumulator</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-slate-100 text-slate-700 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Real-Time Universe Stream</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
             While You&apos;ve Been in This Museum...
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">
-            Physical reality, biology, and data piling up before your eyes in literal real time.
+          <p className="text-base text-slate-600 mt-2 max-w-xl">
+            Physical reality, biology, and data piling up before your eyes in literal real time. Inspired by Neal.fun’s <em>Printing Money</em> and <em>Sell! Sell! Sell!</em>.
           </p>
         </div>
 
         {/* Main Live Stop-Watch Timer Display */}
         <div className="flex flex-col items-start md:items-end">
-          <div className="flex items-center gap-2 bg-slate-50 px-5 py-2.5 rounded-2xl border-2 border-slate-200">
+          <div className="flex items-center gap-3 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-200">
             <Clock className={`w-5 h-5 ${isRunning ? 'text-indigo-600 animate-spin' : 'text-slate-400'}`} style={{ animationDuration: '4s' }} />
-            <span className="font-mono text-2xl sm:text-3xl font-black text-slate-900 tracking-wider">
+            <span className="font-mono text-3xl sm:text-4xl font-black text-slate-900 tracking-wider">
               {formatTimer(elapsedSec)}
             </span>
           </div>
@@ -370,25 +370,25 @@ export default function RealtimeAccumulator() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* CARD 1: US National Debt (LITERAL NEAL.FUN PRINTING-MONEY PHYSICAL BILL STACK!) */}
         {(activeTab === 'all' || activeTab === 'tech') && (
-          <div className="group rounded-3xl p-6 bg-emerald-50/50 border-2 border-emerald-200 hover:border-emerald-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-emerald-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     💵
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-emerald-800 uppercase font-mono tracking-wider">
                       US National Debt Printed
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                       neal.fun/printing-money
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('US National Debt', `+$${Math.round(debtDollars).toLocaleString()}`, `${hundredDollarBills.toLocaleString()} printed $100 bills piled`)}
-                  className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -397,24 +397,24 @@ export default function RealtimeAccumulator() {
 
               {/* Big Neal.fun Number */}
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-emerald-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   +${Math.round(debtDollars).toLocaleString()}
                 </div>
               </div>
 
-              <div className="text-xs text-emerald-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Growing at ~$8,250 every single second ($2.6 Trillion/year)
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Visual 3D Stack of $100 Dollar Bills */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-emerald-200">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <div className="flex items-center justify-between text-[11px] font-mono text-emerald-800 mb-2 font-bold">
                   <span>Stack of $100 Bills:</span>
                   <span>{hundredDollarBills.toLocaleString()} bills</span>
                 </div>
-                <div className="h-10 w-full bg-emerald-100 rounded-xl overflow-hidden relative flex items-center justify-center border border-emerald-300">
+                <div className="h-10 w-full bg-emerald-100/60 rounded-xl overflow-hidden relative flex items-center justify-center border border-emerald-200">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-200 rounded-xl flex items-center justify-end px-3 text-white font-mono text-xs font-bold"
+                    className="h-full bg-emerald-500 transition-all duration-200 rounded-xl flex items-center justify-end px-3 text-white font-mono text-xs font-bold"
                     style={{ width: `${Math.min(100, Math.max(8, (hundredDollarBills / 500) * 100))}%` }}
                   >
                     {hundredDollarBills > 0 && `💵 x${hundredDollarBills}`}
@@ -426,16 +426,16 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-emerald-200/80 text-[11px] font-mono text-emerald-700 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Source: US Treasury Dept</span>
-              <span className="font-bold">+$8.25k/s</span>
+              <span className="font-bold text-slate-700">+$8.25k/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 2: Wi-Fi Data Transfer as Metric Tons of Rice */}
         {(activeTab === 'all' || activeTab === 'tech') && (
-          <div className="group rounded-3xl p-6 bg-indigo-50/50 border-2 border-indigo-200 hover:border-indigo-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
@@ -503,25 +503,25 @@ export default function RealtimeAccumulator() {
 
         {/* CARD 3: Snail vs. Real Familiar Objects (Quarter & Dollar Bill) */}
         {(activeTab === 'all' || activeTab === 'body') && (
-          <div className="group rounded-3xl p-6 bg-lime-50/50 border-2 border-lime-200 hover:border-lime-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-lime-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     🐌
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-lime-900 uppercase font-mono tracking-wider">
                       Garden Snail Crawl Track
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-lime-100 text-lime-800 border border-lime-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-lime-50 text-lime-800 border border-lime-200">
                       Living Macro Velocity
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Garden Snail Distance', `${snailMm.toFixed(1)} mm`, 'Glides on slime at 1.3 mm/s')}
-                  className="p-1.5 rounded-lg text-lime-700 hover:bg-lime-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -536,18 +536,18 @@ export default function RealtimeAccumulator() {
                 </div>
               </div>
 
-              <div className="text-xs text-lime-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Glides across slime at literal 1.3 mm/second (0.0029 mph)
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Visual Race Against a Quarter & Dollar Bill */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-lime-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-slate-700 font-bold">
                   <span>🪙 US Quarter (24.3mm)</span>
                   <span>💵 Dollar Bill (156mm)</span>
                 </div>
                 {/* Visual Slime Track */}
-                <div className="relative w-full h-8 bg-lime-100 rounded-xl overflow-hidden border border-lime-300 flex items-center px-2">
+                <div className="relative w-full h-8 bg-lime-100/60 rounded-xl overflow-hidden border border-lime-200 flex items-center px-2">
                   <div
                     className="absolute top-0 bottom-0 left-0 bg-lime-300/60 rounded-xl transition-all duration-200"
                     style={{ width: `${Math.min(100, (snailMm / 156) * 100)}%` }}
@@ -570,34 +570,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-lime-200/80 text-[11px] font-mono text-lime-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Standard Cornu aspersum</span>
-              <span className="font-bold">1.3 mm/s</span>
+              <span className="font-bold text-slate-700">1.3 mm/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 4: Human Heart Aorta Surge & Blood Volume */}
         {(activeTab === 'all' || activeTab === 'body') && (
-          <div className="group rounded-3xl p-6 bg-rose-50/50 border-2 border-rose-200 hover:border-rose-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-rose-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     ❤️
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-rose-900 uppercase font-mono tracking-wider">
                       Blood Pumped Through Aorta
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
                       Circulatory Surge
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Aortic Blood Pumped', `${bloodLiters.toFixed(2)} Liters`, `Your heart pumped ${sodaCansFilled.toFixed(1)} cans of soda of blood at 1.2 m/s`)}
-                  className="p-1.5 rounded-lg text-rose-700 hover:bg-rose-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -605,24 +605,24 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-rose-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {bloodLiters.toFixed(2)} Liters
                 </div>
               </div>
 
-              <div className="text-xs text-rose-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Surged at peak 1.2 m/s (2.7 mph) during systolic heart contraction
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Soda Cans Filled Beaker */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-rose-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-rose-900 font-bold">
                   <span>Heart Beats: {heartBeats}</span>
                   <span>🥫 ~{sodaCansFilled.toFixed(1)} soda cans</span>
                 </div>
                 <div className="w-full h-4 bg-rose-100 rounded-full overflow-hidden border border-rose-200">
                   <div
-                    className="h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-300"
+                    className="h-full bg-rose-500 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, Math.max(5, (bloodLiters / 20) * 100))}%` }}
                   />
                 </div>
@@ -632,34 +632,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-rose-200/80 text-[11px] font-mono text-rose-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Guyton Physiology Standard</span>
-              <span className="font-bold">84 mL/s</span>
+              <span className="font-bold text-slate-700">84 mL/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 5: Cosmic Light Distance & Moon Trips */}
         {(activeTab === 'all' || activeTab === 'cosmic') && (
-          <div className="group rounded-3xl p-6 bg-amber-50/50 border-2 border-amber-200 hover:border-amber-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-amber-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     💡
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-amber-900 uppercase font-mono tracking-wider">
                       Cosmic Light Traveled
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                       Causality Speed Limit
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Cosmic Light Distance', `${Math.round(lightKm).toLocaleString()} km`, `Light completed ${moonTrips} trips to the Moon`)}
-                  className="p-1.5 rounded-lg text-amber-700 hover:bg-amber-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -667,24 +667,24 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-amber-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {Math.round(lightKm).toLocaleString()} km
                 </div>
               </div>
 
-              <div className="text-xs text-amber-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Speed of light in vacuum: 299,792.458 km/s (186,282 miles/s)
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Moon Trip Orbit Visualizer */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-amber-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-amber-900 font-bold">
                   <span>🌍 Earth to Moon (384,400 km)</span>
                   <span>{moonTrips}x Moon trips</span>
                 </div>
                 <div className="w-full h-3 bg-amber-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full transition-all duration-200"
+                    className="h-full bg-amber-400 rounded-full transition-all duration-200"
                     style={{ width: `${Math.min(100, Math.max(5, (lightKm / moonDistanceKm) * 100))}%` }}
                   />
                 </div>
@@ -694,16 +694,16 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-amber-200/80 text-[11px] font-mono text-amber-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Grace Hopper 1ns: 11.8 inches</span>
-              <span className="font-bold">299,792 km/s</span>
+              <span className="font-bold text-slate-700">299,792 km/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 6: CPU Clock Cycles & Time Dilation */}
         {(activeTab === 'all' || activeTab === 'tech') && (
-          <div className="group rounded-3xl p-6 bg-purple-50/50 border-2 border-purple-200 hover:border-purple-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
@@ -769,25 +769,25 @@ export default function RealtimeAccumulator() {
 
         {/* CARD 7: Fingernails Microscopic Growth */}
         {(activeTab === 'all' || activeTab === 'body') && (
-          <div className="group rounded-3xl p-6 bg-pink-50/50 border-2 border-pink-200 hover:border-pink-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-pink-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     💅
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-pink-900 uppercase font-mono tracking-wider">
                       Your Fingernails Grew
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-800 border border-pink-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-800 border border-pink-200">
                       Keratin Matrix
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Fingernail Growth', `${fingernailNm < 1000 ? fingernailNm.toFixed(1) + ' nm' : fingernailMm.toFixed(4) + ' mm'}`, 'Grows continuously at 1.32 nanometers every second')}
-                  className="p-1.5 rounded-lg text-pink-700 hover:bg-pink-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -795,19 +795,19 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-pink-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {fingernailNm < 1000
                     ? `${fingernailNm.toFixed(1)} nm`
                     : `${fingernailMm.toFixed(4)} mm`}
                 </div>
               </div>
 
-              <div className="text-xs text-pink-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Cellular expansion at 1.32 nanometers/sec (~3.5 mm/month)
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Nanometer Microscopic Scale Bar */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-pink-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-pink-900 font-bold">
                   <span>Microscopic scale:</span>
                   <span>
@@ -818,7 +818,7 @@ export default function RealtimeAccumulator() {
                 </div>
                 <div className="w-full h-3 bg-pink-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all duration-300"
+                    className="h-full bg-pink-500 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, Math.max(5, (fingernailNm / 500) * 100))}%` }}
                   />
                 </div>
@@ -828,34 +828,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-pink-200/80 text-[11px] font-mono text-pink-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Yaemsiri et al. 2010 Study</span>
-              <span className="font-bold">1.32 nm/s</span>
+              <span className="font-bold text-slate-700">1.32 nm/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 8: Earth Orbiting the Sun */}
         {(activeTab === 'all' || activeTab === 'cosmic') && (
-          <div className="group rounded-3xl p-6 bg-cyan-50/50 border-2 border-cyan-200 hover:border-cyan-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-cyan-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     🌍
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-cyan-900 uppercase font-mono tracking-wider">
                       Earth Hurtled Through Space
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">
                       Heliospheric Orbit
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Earth Orbital Distance', `${Math.round(earthOrbitKm).toLocaleString()} km`, 'Earth orbits the Sun at 29.78 km/s (66,600 mph)')}
-                  className="p-1.5 rounded-lg text-cyan-700 hover:bg-cyan-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -863,17 +863,17 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-cyan-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {Math.round(earthOrbitKm).toLocaleString()} km
                 </div>
               </div>
 
-              <div className="text-xs text-cyan-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Orbiting the Sun at 29.78 km/s (66,600 mph)
               </div>
 
               {/* PHYSICAL ACCUMULATOR: Equator Lap Visualizer */}
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-cyan-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-cyan-900 font-bold">
                   <span>Equator Lap (40,075 km):</span>
                   <span>
@@ -884,7 +884,7 @@ export default function RealtimeAccumulator() {
                 </div>
                 <div className="w-full h-3 bg-cyan-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300"
+                    className="h-full bg-cyan-500 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, Math.max(5, (earthOrbitKm / 40075) * 100))}%` }}
                   />
                 </div>
@@ -894,34 +894,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-cyan-200/80 text-[11px] font-mono text-cyan-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>NASA JPL Horizons</span>
-              <span className="font-bold">29.78 km/s</span>
+              <span className="font-bold text-slate-700">29.78 km/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 9: Voyager 1 Spacecraft Escape */}
         {(activeTab === 'all' || activeTab === 'cosmic') && (
-          <div className="group rounded-3xl p-6 bg-teal-50/50 border-2 border-teal-200 hover:border-teal-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-teal-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     🛰️
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-teal-900 uppercase font-mono tracking-wider">
                       Voyager 1 Interstellar Void
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
                       Farthest Human Artifact
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Voyager 1 Travel', `${voyagerKm.toFixed(1)} km`, 'Cruising through interstellar space at 17.0 km/s')}
-                  className="p-1.5 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -929,25 +929,25 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-teal-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {voyagerKm < 100
                     ? `${Math.round(voyagerMeters).toLocaleString()} meters`
                     : `${voyagerKm.toFixed(1)} km`}
                 </div>
               </div>
 
-              <div className="text-xs text-teal-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Escaping into deep space at 17.0 km/s (38,000 mph)
               </div>
 
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-teal-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-teal-900 font-bold">
                   <span>Current Earth Distance:</span>
                   <span>&gt;24.5 Billion km</span>
                 </div>
                 <div className="w-full h-3 bg-teal-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full transition-all duration-300"
+                    className="h-full bg-teal-500 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, Math.max(5, (voyagerMeters / 100000) * 100))}%` }}
                   />
                 </div>
@@ -957,34 +957,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-teal-200/80 text-[11px] font-mono text-teal-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Deep Space Network Telemetry</span>
-              <span className="font-bold">17.0 km/s</span>
+              <span className="font-bold text-slate-700">17.0 km/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 10: Global Atmospheric Lightning Strikes */}
         {(activeTab === 'all' || activeTab === 'tech') && (
-          <div className="group rounded-3xl p-6 bg-yellow-50/50 border-2 border-yellow-200 hover:border-yellow-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-yellow-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     ⚡
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-yellow-900 uppercase font-mono tracking-wider">
                       Global Lightning Strikes
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                       Atmospheric Energy
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Lightning Strikes', `${lightningStrikes.toLocaleString()} bolts`, '~100 lightning flashes strike Earth every second')}
-                  className="p-1.5 rounded-lg text-yellow-700 hover:bg-yellow-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -992,23 +992,23 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-yellow-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {lightningStrikes.toLocaleString()} bolts
                 </div>
               </div>
 
-              <div className="text-xs text-yellow-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Earth experiences ~100 cloud and ground lightning discharges every second
               </div>
 
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-yellow-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-yellow-900 font-bold">
                   <span>Power discharge:</span>
                   <span>~{(lightningStrikes * 1.2).toFixed(0)} Gigawatts</span>
                 </div>
                 <div className="w-full h-3 bg-yellow-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full transition-all duration-200"
+                    className="h-full bg-amber-400 rounded-full transition-all duration-200"
                     style={{ width: `${Math.min(100, Math.max(5, (lightningStrikes / 1000) * 100))}%` }}
                   />
                 </div>
@@ -1018,34 +1018,34 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-yellow-200/80 text-[11px] font-mono text-yellow-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>NASA LIS Satellite Sensor</span>
-              <span className="font-bold">100 strikes/s</span>
+              <span className="font-bold text-slate-700">100 strikes/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 11: Scalp Hair Synthesis (Keratin Production) */}
         {(activeTab === 'all' || activeTab === 'body') && (
-          <div className="group rounded-3xl p-6 bg-orange-50/50 border-2 border-orange-200 hover:border-orange-400 shadow-sm transition-all flex flex-col justify-between overflow-hidden">
+          <div className="group rounded-3xl p-6 bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-3xl p-2.5 rounded-2xl bg-white border border-orange-200 shadow-2xs select-none">
+                  <span className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 select-none">
                     💇
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-orange-900 uppercase font-mono tracking-wider">
                       Scalp Hair Synthesized
                     </h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-300">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-50 text-orange-800 border border-orange-200">
                       100k Follicles Combined
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleShareCard('Scalp Hair Production', `${hairMm.toFixed(2)} mm`, 'Combined production across all 100,000 scalp follicles')}
-                  className="p-1.5 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   title="Share"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -1053,25 +1053,25 @@ export default function RealtimeAccumulator() {
               </div>
 
               <div className="my-2">
-                <div className="text-3xl sm:text-4xl font-black text-orange-950 font-mono tracking-tight">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
                   {hairMm < 10
                     ? `${hairMm.toFixed(2)} mm`
                     : `${(hairMm / 10).toFixed(2)} cm`}
                 </div>
               </div>
 
-              <div className="text-xs text-orange-900 font-semibold leading-relaxed">
+              <div className="text-xs text-slate-600 font-medium leading-relaxed">
                 Single strand grows 4.75 nm/s, but 100,000 strands add up to 0.475 mm/s!
               </div>
 
-              <div className="mt-4 p-3 rounded-2xl bg-white border border-orange-200 space-y-2">
+              <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-mono text-orange-900 font-bold">
                   <span>Daily keratin output:</span>
                   <span>~41 meters of strand/day</span>
                 </div>
                 <div className="w-full h-3 bg-orange-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-orange-400 to-amber-500 rounded-full transition-all duration-300"
+                    className="h-full bg-amber-500 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, Math.max(5, (hairMm / 50) * 100))}%` }}
                   />
                 </div>
@@ -1081,15 +1081,15 @@ export default function RealtimeAccumulator() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-orange-200/80 text-[11px] font-mono text-orange-800 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 flex items-center justify-between">
               <span>Dermatology Biometrics</span>
-              <span className="font-bold">0.475 mm/s</span>
+              <span className="font-bold text-slate-700">0.475 mm/s</span>
             </div>
           </div>
         )}
 
         {/* CARD 12: YOUR PERSONAL SPEED COMPARATOR (Like Entering Your Wage on printing-money!) */}
-        <div className="group rounded-3xl p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-300 shadow-sm flex flex-col justify-between overflow-hidden">
+        <div className="group rounded-3xl p-6 bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
