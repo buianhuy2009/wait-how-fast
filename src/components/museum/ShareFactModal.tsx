@@ -132,33 +132,33 @@ export default function ShareFactModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-2xl bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden">
         {/* Close Button */}
         <button
           onClick={() => {
             playClick(600);
             onClose();
           }}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-indigo-400" />
-          <h3 className="text-lg font-bold text-white">Export & Share Exhibit Plaque</h3>
+          <Sparkles className="w-5 h-5 text-indigo-600" />
+          <h3 className="text-xl font-black text-slate-900">Export & Share Exhibit Plaque</h3>
         </div>
 
         {/* Visual Fact Card Preview */}
         <div
           ref={cardRef}
-          className="rounded-2xl p-6 bg-gradient-to-br from-slate-950 via-indigo-950/40 to-slate-950 border border-indigo-500/30 shadow-2xl relative mb-6"
+          className="rounded-2xl p-6 bg-slate-900 border border-slate-800 shadow-xl relative mb-6"
         >
           <div className="flex items-center justify-between text-[11px] font-mono text-indigo-400 mb-2">
             <span>WAIT, HOW FAST IS THAT?</span>
-            <span className="text-slate-500">EXHIBIT CITATION</span>
+            <span className="text-slate-400">EXHIBIT CITATION</span>
           </div>
 
           <h4 className="text-xl font-bold text-white mb-2">{title}</h4>
@@ -187,20 +187,20 @@ export default function ShareFactModal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             onClick={handleCopyText}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all border ${
+            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-sm transition-all border ${
               copiedSnippet
-                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:text-white'
+                ? 'bg-emerald-50 border-emerald-500 text-emerald-800'
+                : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
             }`}
           >
-            {copiedSnippet ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {copiedSnippet ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-600" />}
             <span>{copiedSnippet ? 'Snippet Copied!' : 'Copy Social / Blog Quote'}</span>
           </button>
 
           <button
             onClick={handleExportPng}
             disabled={isExporting}
-            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.01]"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all active:scale-98"
           >
             <Download className="w-4 h-4" />
             <span>{isExporting ? 'Generating PNG...' : 'Download Image Card (PNG)'}</span>

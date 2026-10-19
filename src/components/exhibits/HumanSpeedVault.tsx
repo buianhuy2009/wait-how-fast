@@ -100,7 +100,7 @@ export default function HumanSpeedVault() {
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   // Neural Reaction Time Mini-Game
-  const [reactionState, setReactionState] = useState<'idle' | 'waiting' | 'ready' | 'result'>('idle');
+  const [reactionState, setReactionState] = useState<'idle' | 'waiting' | 'ready' | 'result' | 'early'>('idle');
   const [reactionTimeMs, setReactionTimeMs] = useState<number | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -122,15 +122,16 @@ export default function HumanSpeedVault() {
   const handleBoxClick = () => {
     if (reactionState === 'waiting') {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      setReactionState('idle');
+      setReactionState('early');
       playBuzz();
-      alert('Too early! Wait for the box to turn emerald green.');
     } else if (reactionState === 'ready') {
       const elapsed = Math.round(performance.now() - startTimestampRef.current);
       setReactionTimeMs(elapsed);
       setReactionState('result');
       playClick(1000);
       setHistory((prev) => [elapsed, ...prev.slice(0, 4)]);
+    } else if (reactionState === 'early') {
+      startReactionTest();
     }
   };
 
@@ -251,43 +252,53 @@ export default function HumanSpeedVault() {
           onClick={handleBoxClick}
           className={`w-full h-44 rounded-2xl border-2 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-150 ${
             reactionState === 'idle'
-              ? 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-indigo-500'
+              ? 'bg-slate-50 border-slate-300 text-slate-700 hover:border-indigo-500'
               : reactionState === 'waiting'
-              ? 'bg-rose-500/10 border-rose-500/60 text-rose-500 animate-pulse'
+              ? 'bg-rose-50 border-rose-400 text-rose-700 animate-pulse'
               : reactionState === 'ready'
               ? 'bg-emerald-500 border-emerald-400 text-white shadow-xl scale-[1.01]'
-              : 'bg-indigo-50 dark:bg-indigo-950/80 border-indigo-500 text-indigo-900 dark:text-indigo-200'
+              : reactionState === 'early'
+              ? 'bg-red-50 border-red-400 text-red-700'
+              : 'bg-indigo-50 border-indigo-500 text-indigo-900'
           }`}
         >
           {reactionState === 'idle' && (
             <div className="text-center space-y-1">
               <span className="text-3xl">🎯</span>
-              <div className="text-sm font-bold">Click &quot;Start Reflex Test&quot; Below</div>
-              <div className="text-xs text-slate-400">Click when the box turns bright green!</div>
+              <div className="text-sm font-bold text-slate-900">Click &quot;Start Reflex Test&quot; Below</div>
+              <div className="text-xs text-slate-500">Click when the box turns bright green!</div>
             </div>
           )}
 
           {reactionState === 'waiting' && (
             <div className="text-center space-y-1">
               <span className="text-3xl">⏳</span>
-              <div className="text-base font-black">Wait for Green...</div>
-              <div className="text-xs text-rose-400">Don&apos;t click yet!</div>
+              <div className="text-base font-black text-rose-700">Wait for Green...</div>
+              <div className="text-xs text-rose-600 font-semibold">Don&apos;t click yet!</div>
             </div>
           )}
 
           {reactionState === 'ready' && (
             <div className="text-center space-y-1">
               <span className="text-4xl">⚡</span>
-              <div className="text-xl font-black tracking-wider">CLICK NOW!</div>
+              <div className="text-2xl font-black tracking-wider text-white">CLICK NOW!</div>
+            </div>
+          )}
+
+          {reactionState === 'early' && (
+            <div className="text-center space-y-1">
+              <span className="text-3xl">🚨</span>
+              <div className="text-base font-black text-red-700">Too Early! Click to Try Again</div>
+              <div className="text-xs text-red-600 font-semibold">Wait until the box turns bright green!</div>
             </div>
           )}
 
           {reactionState === 'result' && reactionTimeMs && (
             <div className="text-center space-y-1">
-              <div className="text-3xl font-black font-mono text-indigo-600 dark:text-indigo-400">
+              <div className="text-4xl font-black font-mono text-indigo-600">
                 {reactionTimeMs} ms
               </div>
-              <div className="text-xs font-medium">
+              <div className="text-xs font-bold text-slate-700">
                 {reactionTimeMs < 180
                   ? '🏆 Pro Esports Reflexes (< 180 ms)!'
                   : reactionTimeMs < 250

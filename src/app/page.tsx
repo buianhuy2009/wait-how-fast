@@ -99,42 +99,42 @@ export default function MuseumLobby() {
                 key={wing.slug}
                 href={`/hall/${wing.slug}`}
                 onClick={() => playClick(850)}
-                className="group relative rounded-3xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+                className="group relative rounded-3xl p-6 bg-white border-2 border-slate-200/90 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   {/* Top Bar: Number & Tag */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-black font-mono text-slate-300 dark:text-slate-700 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <span className="text-2xl font-black font-mono text-slate-300 group-hover:text-indigo-600 transition-colors">
                       {wing.number}
                     </span>
-                    <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-700">
                       Walk In &rarr;
                     </span>
                   </div>
 
                   {/* Icon & Title */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="text-3xl p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm group-hover:scale-110 transition-transform select-none">
+                  <div className="flex items-center gap-3.5 mb-3">
+                    <div className="text-3xl p-2.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs group-hover:scale-110 transition-transform select-none">
                       {wing.emoji}
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                         {wing.title}
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{wing.subtitle}</p>
+                      <p className="text-xs text-slate-500 font-medium">{wing.subtitle}</p>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-2">
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2">
                     {wing.description}
                   </p>
                 </div>
 
                 {/* Footer Action */}
-                <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400 font-semibold">ENTER WING</span>
-                  <span className="text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400 font-bold">ENTER WING</span>
+                  <span className="text-indigo-600 font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                     <span>Explore Room</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </span>
@@ -147,25 +147,25 @@ export default function MuseumLobby() {
           <Link
             href="/all"
             onClick={() => playClick(850)}
-            className="group relative rounded-3xl p-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between border border-indigo-700/50"
+            className="group relative rounded-3xl p-6 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between border-2 border-indigo-400/40"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl font-black font-mono text-indigo-400">00</span>
-                <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-indigo-500/20 border border-indigo-400/40 text-indigo-200">
+                <span className="text-2xl font-black font-mono text-indigo-200">00</span>
+                <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-white/20 border border-white/30 text-white">
                   Full Tour
                 </span>
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-3 rounded-2xl bg-indigo-600 text-white shadow-lg group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-2xl bg-white/20 text-white shadow-lg group-hover:scale-110 transition-transform">
                   <Layers className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">
+                  <h3 className="text-xl font-black text-white group-hover:text-cyan-200 transition-colors">
                     Grand Walkthrough
                   </h3>
-                  <p className="text-xs text-indigo-200">All 7 Wings in Sequence</p>
+                  <p className="text-xs text-indigo-100 font-medium">All 7 Wings in Sequence</p>
                 </div>
               </div>
 
@@ -174,11 +174,11 @@ export default function MuseumLobby() {
               </p>
             </div>
 
-            <div className="pt-4 mt-6 border-t border-indigo-800/60 flex items-center justify-between text-xs font-mono">
-              <span className="text-indigo-300 font-bold flex items-center gap-1">
+            <div className="pt-4 mt-6 border-t border-white/20 flex items-center justify-between text-xs font-mono">
+              <span className="text-white font-black flex items-center gap-1">
                 Enter All Wings <ArrowRight className="w-3.5 h-3.5" />
               </span>
-              <span className="text-indigo-400 font-bold">All 7 Galleries</span>
+              <span className="text-indigo-200 font-bold">All 7 Galleries</span>
             </div>
           </Link>
         </div>

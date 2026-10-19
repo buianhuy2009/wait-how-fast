@@ -175,25 +175,25 @@ export default function DataFlood({
   return (
     <div className="w-full space-y-6">
       {/* Upper Interactive Arena: The Great "b" vs "B" Pipe */}
-      <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm text-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-600 shadow-2xs">
               <Waves className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white tracking-tight">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                 The Great &quot;b&quot; vs &quot;B&quot; Trap (Why 1 Gbps &ne; 1 GB/s)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Internet providers advertise in <strong>lowercase bits (b)</strong>. Your computer files are stored in <strong>capital Bytes (B)</strong>!
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-slate-400">THE LAW:</span>
-            <span className="px-3 py-1 rounded-lg bg-indigo-950 border border-indigo-500/40 text-indigo-300 font-bold">
+            <span className="text-slate-400 font-bold">THE LAW:</span>
+            <span className="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-black shadow-2xs">
               1 Byte (B) = 8 bits (b)
             </span>
           </div>
@@ -202,16 +202,16 @@ export default function DataFlood({
         {/* Live Pipe & Valve Visualizer */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
           {/* Animated Pipe Canvas */}
-          <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 relative">
+          <div className="w-full h-44 rounded-2xl overflow-hidden border border-slate-800 bg-[#0a0d18] relative shadow-inner">
             <canvas ref={canvasRef} width={460} height={176} className="w-full h-full block" />
           </div>
 
           {/* Real-World Internet Speed & Steam Download Calculator */}
-          <div className="space-y-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+          <div className="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
             <div>
               <div className="flex items-center justify-between text-xs font-mono mb-1.5">
-                <span className="text-slate-400">YOUR INTERNET SPEED PLAN:</span>
-                <span className="text-cyan-400 font-bold">
+                <span className="text-slate-600 font-bold">YOUR INTERNET SPEED PLAN:</span>
+                <span className="text-indigo-600 font-black text-sm">
                   {ispSpeedMbps >= 1000 ? `${(ispSpeedMbps / 1000).toFixed(1)} Gbps` : `${ispSpeedMbps} Mbps`}
                 </span>
               </div>
@@ -222,9 +222,9 @@ export default function DataFlood({
                 step="50"
                 value={ispSpeedMbps}
                 onChange={(e) => setIspSpeedMbps(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-ew-resize accent-cyan-400"
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-indigo-600"
               />
-              <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+              <div className="flex justify-between text-[10px] font-mono text-slate-400 font-bold mt-1">
                 <span>50 Mbps</span>
                 <span>1 Gbps (Standard Fiber)</span>
                 <span>5 Gbps</span>
@@ -233,27 +233,27 @@ export default function DataFlood({
 
             {/* Conversion Result Cards */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                <span className="text-[10px] text-slate-500 block">ISP ADVERTISED SPEED</span>
-                <strong className="text-cyan-400 text-sm">{ispSpeedMbps} Mbps</strong>
-                <span className="text-[10px] text-slate-400 block mt-0.5">Bits per second</span>
+              <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">ISP ADVERTISED SPEED</span>
+                <strong className="text-indigo-600 text-base font-black">{ispSpeedMbps} Mbps</strong>
+                <span className="text-[10px] text-slate-500 block mt-0.5">Bits per second</span>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900 border border-indigo-500/30">
-                <span className="text-[10px] text-indigo-400 block font-semibold">ACTUAL FILE DOWNLOAD RATE</span>
-                <strong className="text-indigo-300 text-sm">{throughput.speedMBps.toFixed(1)} MB/s</strong>
-                <span className="text-[10px] text-slate-400 block mt-0.5">MegaBYTES per second</span>
+              <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 shadow-2xs">
+                <span className="text-[10px] text-indigo-700 font-bold block uppercase">ACTUAL FILE DOWNLOAD RATE</span>
+                <strong className="text-indigo-950 text-base font-black">{throughput.speedMBps.toFixed(1)} MB/s</strong>
+                <span className="text-[10px] text-slate-600 block mt-0.5">MegaBYTES per second</span>
               </div>
             </div>
 
             {/* Download Time Calculator */}
-            <div className="space-y-2 pt-2 border-t border-slate-800 text-xs font-mono">
+            <div className="space-y-2 pt-2 border-t border-slate-200 text-xs font-mono">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Download time for a {gameSizeGb} GB file:</span>
-                <span className="text-emerald-400 font-bold">{throughput.formattedDownloadTime}</span>
+                <span className="text-slate-600 font-medium">Download time for a {gameSizeGb} GB file:</span>
+                <span className="text-emerald-600 font-black text-sm">{throughput.formattedDownloadTime}</span>
               </div>
               <div className="flex items-center gap-1.5 text-[10px]">
-                <span className="text-slate-500">File size:</span>
+                <span className="text-slate-500 font-bold">File size:</span>
                 {[10, 50, 100, 150].map((gb) => (
                   <button
                     key={gb}
@@ -261,10 +261,10 @@ export default function DataFlood({
                       playClick(800);
                       setGameSizeGb(gb);
                     }}
-                    className={`px-2 py-0.5 rounded font-mono ${
+                    className={`px-2.5 py-1 rounded-lg font-mono font-bold transition-all ${
                       gameSizeGb === gb
-                        ? 'bg-indigo-600 text-white font-bold'
-                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {gb}GB
@@ -277,17 +277,17 @@ export default function DataFlood({
       </div>
 
       {/* Lower Interactive Arena: "What If 1 Byte Was..." Physical Scaling Engine */}
-      <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm text-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400">
+            <div className="p-2.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 shadow-2xs">
               <Scale className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white tracking-tight">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                 The Physical Scaling Engine (&ldquo;What If 1 Byte Was...&rdquo;)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Data is invisible—until you map each byte to physical matter in the universe.
               </p>
             </div>
@@ -296,7 +296,7 @@ export default function DataFlood({
 
         {/* 1. Pick Data Size */}
         <div className="mb-6 space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
             STEP 1: SELECT DATA VOLUME
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -306,14 +306,14 @@ export default function DataFlood({
                 <button
                   key={size.id}
                   onClick={() => handleSizeChange(size.id)}
-                  className={`p-3 rounded-xl border text-center font-mono transition-all ${
+                  className={`p-3 rounded-2xl border text-center font-mono transition-all ${
                     isSelected
-                      ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/20 font-bold scale-[1.02]'
-                      : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-md font-bold scale-[1.02]'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
                   }`}
                 >
-                  <div className="text-sm">{size.abbreviation}</div>
-                  <div className="text-[10px] text-slate-400">{size.name}</div>
+                  <div className="text-sm font-black">{size.abbreviation}</div>
+                  <div className="text-[10px] opacity-80">{size.name}</div>
                 </button>
               );
             })}
@@ -322,7 +322,7 @@ export default function DataFlood({
 
         {/* 2. Pick Physical Matter Analogy */}
         <div className="mb-6 space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
             STEP 2: SELECT PHYSICAL MATTER OBJECT
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -332,16 +332,16 @@ export default function DataFlood({
                 <button
                   key={analogy.id}
                   onClick={() => handleAnalogyChange(analogy.id)}
-                  className={`p-3 rounded-xl border text-left transition-all flex items-center gap-3 ${
+                  className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-3 ${
                     isSelected
-                      ? 'bg-cyan-500/20 border-cyan-500/60 text-white shadow-lg shadow-cyan-500/10'
-                      : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? 'bg-cyan-50 border-cyan-500 text-cyan-950 font-bold shadow-sm ring-2 ring-cyan-500/20'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
                   }`}
                 >
                   <span className="text-2xl">{analogy.icon}</span>
                   <div className="truncate">
                     <div className="text-xs font-bold truncate">{analogy.name.split('(')[0]}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{analogy.unitNoun}</div>
+                    <div className="text-[10px] text-slate-500 truncate">{analogy.unitNoun}</div>
                   </div>
                 </button>
               );
@@ -351,33 +351,33 @@ export default function DataFlood({
 
         {/* 3. Scaled Result Showcase Box */}
         {currentScale && (
-          <div className="relative rounded-2xl p-6 bg-gradient-to-br from-slate-950 via-indigo-950/30 to-slate-950 border border-indigo-500/30 shadow-2xl overflow-hidden">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-indigo-500/20 pb-4 mb-4">
+          <div className="relative rounded-3xl p-6 bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/80 border-2 border-indigo-200 shadow-sm overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-indigo-100 pb-4 mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">{selectedAnalogy.icon}</span>
+                <span className="text-4xl p-2 rounded-2xl bg-white border border-indigo-100 shadow-2xs">{selectedAnalogy.icon}</span>
                 <div>
-                  <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider">
+                  <span className="text-[11px] font-mono text-indigo-700 uppercase tracking-wider font-bold">
                     {selectedSize.name} ({selectedSize.abbreviation}) IN {selectedAnalogy.name.toUpperCase()}
                   </span>
-                  <h4 className="text-xl font-black text-white tracking-tight mt-0.5">
+                  <h4 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
                     {currentScale.quantity}
                   </h4>
                 </div>
               </div>
 
-              <div className="px-3 py-1.5 rounded-lg bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 font-mono text-xs">
+              <div className="px-3.5 py-1.5 rounded-xl bg-white border border-indigo-200 text-indigo-900 font-mono text-xs font-bold shadow-2xs">
                 {selectedSize.bytes.toLocaleString()} Bytes
               </div>
             </div>
 
             {/* Comparison Narrative */}
-            <div className="text-base text-slate-100 font-medium leading-relaxed mb-4">
+            <div className="text-base sm:text-lg text-slate-800 font-semibold leading-relaxed mb-4">
               {currentScale.comparison}
             </div>
 
             {/* Wi-Fi Throughput Fact Pill */}
-            <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200/90 leading-relaxed flex items-start gap-2.5">
-              <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed flex items-start gap-2.5 font-medium">
+              <Zap className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-amber-300 font-semibold block mb-0.5">
                   Real-World Wi-Fi Router Throughput:

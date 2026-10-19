@@ -692,8 +692,8 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     <div className="w-full space-y-6">
       {/* Exhibit Selector Bar */}
       <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
-          SELECT LATENCY EXPERIMENT:
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
+          Select Latency Experiment:
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
           {LATENCY_EXHIBITS.map((item) => {
@@ -702,19 +702,15 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
               <button
                 key={item.id}
                 onClick={() => selectExhibit(item)}
-                className={`p-2.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                className={`p-3 rounded-2xl border-2 text-left transition-all flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-slate-800 border-indigo-500 shadow-lg text-white'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
+                    ? 'bg-cyan-50 border-cyan-600 shadow-sm ring-2 ring-cyan-500/20 text-cyan-950 font-bold'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                 }`}
-                style={{
-                  borderLeftColor: isSelected ? '#6366f1' : undefined,
-                  borderLeftWidth: isSelected ? '4px' : undefined,
-                }}
               >
-                <div className="text-xl mb-1">{item.icon}</div>
-                <div className="text-xs font-bold truncate text-slate-200">{item.name}</div>
-                <div className="text-[10px] font-mono text-cyan-400 mt-0.5 truncate">
+                <div className="text-2xl mb-1 select-none">{item.icon}</div>
+                <div className="text-xs font-bold truncate text-slate-900">{item.name}</div>
+                <div className="text-[10px] font-mono font-bold text-cyan-700 mt-0.5 truncate">
                   {item.roundTripMs < 1000
                     ? `${item.roundTripMs} ms`
                     : item.roundTripMs < 60_000
@@ -730,19 +726,19 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
       </div>
 
       {/* Main Interactive Arcade Window */}
-      <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+      <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 mb-6">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => {
                 playClick(800);
                 setActiveTab('fiber');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'fiber'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Lightbulb className="w-3.5 h-3.5" />
@@ -754,10 +750,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('typing');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'typing'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
@@ -769,10 +765,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('reflex');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'reflex'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Timer className="w-3.5 h-3.5" />
@@ -784,10 +780,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('pong');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'pong'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Radio className="w-3.5 h-3.5" />
@@ -799,10 +795,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('rover');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'rover'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5" />
@@ -814,10 +810,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('mars');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'mars'
-                  ? 'bg-red-500/20 text-red-300 border border-red-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -829,10 +825,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 playClick(800);
                 setActiveTab('voyager');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 activeTab === 'voyager'
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <Rocket className="w-3.5 h-3.5" />
@@ -840,9 +836,9 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-cyan-400">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-600">
             <span>ROUND-TRIP DELAY:</span>
-            <strong className="px-2 py-0.5 rounded bg-slate-800 border border-cyan-500/30 text-white">
+            <strong className="px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-300 text-slate-900">
               {activeExhibit.roundTripMs < 1000
                 ? `${activeExhibit.roundTripMs} ms`
                 : activeExhibit.roundTripMs < 60_000

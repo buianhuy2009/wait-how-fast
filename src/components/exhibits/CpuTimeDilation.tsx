@@ -95,7 +95,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
     <div className="w-full space-y-6">
       {/* Upper Selector Grid: Computer Operations */}
       <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
           SELECT CPU HARDWARE OPERATION (1 NS = 1 HUMAN SECOND):
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-9 gap-2">
@@ -105,10 +105,10 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
               <button
                 key={op.id}
                 onClick={() => selectOp(op)}
-                className={`p-2.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                className={`p-2.5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-slate-800 border-indigo-500 shadow-lg text-white'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
+                    ? 'bg-purple-50 border-purple-500 shadow-sm ring-2 ring-purple-500/20 text-slate-900'
+                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-900'
                 }`}
                 style={{
                   borderLeftColor: isSelected ? op.accentColor : undefined,
@@ -116,8 +116,8 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
                 }}
               >
                 <div className="text-xl mb-1">{op.icon}</div>
-                <div className="text-xs font-bold truncate text-slate-200">{op.name}</div>
-                <div className="text-[10px] font-mono text-cyan-400 mt-0.5 truncate">{op.realTimeDisplay}</div>
+                <div className="text-xs font-bold truncate text-slate-900">{op.name}</div>
+                <div className="text-[10px] font-mono text-purple-600 font-bold mt-0.5 truncate">{op.realTimeDisplay}</div>
               </button>
             );
           })}
@@ -125,38 +125,38 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
       </div>
 
       {/* Main Interactive Stage: The CPU Worker Office */}
-      <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+      <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
         {/* Stage Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-400">
+            <div className="p-2.5 rounded-2xl bg-purple-50 border border-purple-200 text-purple-600 shadow-2xs">
               <Cpu className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white tracking-tight">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                 The CPU Time Dilation Chamber (1 Nanosecond = 1 Human Second)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Slowed down <strong>1,000,000,000&times;</strong> to reveal what your CPU does while waiting for data.
               </p>
             </div>
           </div>
 
           {/* Dual Live Clocks */}
-          <div className="flex items-center gap-6 text-xs font-mono">
-            <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-slate-500 block text-[10px]">CPU REAL TIME</span>
-              <strong className="text-cyan-400 text-sm">{activeOp.realTimeDisplay}</strong>
+          <div className="flex items-center gap-4 text-xs font-mono">
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+              <span className="text-slate-400 block text-[10px] font-bold">CPU REAL TIME</span>
+              <strong className="text-indigo-600 text-sm font-black">{activeOp.realTimeDisplay}</strong>
             </div>
-            <div className="p-2.5 rounded-xl bg-slate-950 border border-purple-500/30">
-              <span className="text-purple-400 block text-[10px] font-semibold">HUMAN DILATED TIME</span>
-              <strong className="text-white text-sm">{activeOp.dilatedDisplay}</strong>
+            <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200">
+              <span className="text-purple-700 block text-[10px] font-bold">HUMAN DILATED TIME</span>
+              <strong className="text-purple-950 text-sm font-black">{activeOp.dilatedDisplay}</strong>
             </div>
           </div>
         </div>
 
         {/* The Animated Office Simulation Arena */}
-        <div className="relative rounded-2xl p-8 bg-slate-950 border border-slate-800 overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+        <div className="relative rounded-2xl p-8 bg-[#0b0f19] border border-slate-800 overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
           {/* Subtle office floor grid */}
           <div
             className="absolute inset-0 opacity-10 pointer-events-none"

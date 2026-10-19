@@ -56,9 +56,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+      <body className="min-h-full flex flex-col bg-[#f5f7fb] text-slate-900 selection:bg-indigo-500/20 selection:text-indigo-900">
         <CalibrationProvider>
           <SoundProvider>
             <Navbar />

@@ -41,7 +41,7 @@ export default function HallExhibitLoader({ slug }: { slug: string }) {
   return (
     <Suspense
       fallback={
-        <div className="w-full h-72 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center justify-center font-mono text-xs text-slate-500 animate-pulse">
+        <div className="w-full h-72 rounded-3xl bg-white border border-slate-200 flex items-center justify-center font-mono text-xs text-slate-500 animate-pulse shadow-sm">
           Opening Exhibition Hall...
         </div>
       }
