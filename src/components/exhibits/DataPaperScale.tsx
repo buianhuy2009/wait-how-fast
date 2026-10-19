@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSound } from '@/context/SoundContext';
-import { Wifi, ArrowDown } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 interface DataStep {
   size: string;
@@ -32,7 +32,7 @@ const DATA_PAPER_STEPS: DataStep[] = [
     quantityTitle: '1,000 Grains • 29 grams',
     analogyHeadline: 'A spoonful of rice in your palm',
     icon: '🥄',
-    description: 'About 2 tablespoons of rice. Fits comfortably in your cupped hand, weighing about as much as a slice of bread.',
+    description: 'About 2 tablespoons of rice. Fits comfortably in your cupped hand, weighing about as much as a single slice of bread.',
     comparisonFact: 'A snack bowl portion of uncooked grains.',
     techExample: 'A short paragraph of text or a plain text email.',
   },
@@ -87,7 +87,7 @@ export default function DataPaperScale() {
   const bytesPerSec = userMbps * 125_000;
   const kgPerSec = (bytesPerSec * 0.029) / 1000;
   const tonsPerSec = kgPerSec / 1000;
-  const pickupTrucksPerSec = tonsPerSec / 1.5; // 1.5 tons per pickup truck bed
+  const pickupTrucksPerSec = tonsPerSec / 1.5;
 
   return (
     <div className="w-full space-y-16">
@@ -100,57 +100,55 @@ export default function DataPaperScale() {
           What If 1 Byte Was 1 Grain of Rice?
         </h2>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-          Data is invisible. But when every single Byte becomes a physical grain of rice (0.029 grams), the numbers reveal their true cosmic mass.
+          Data is invisible. But when every single Byte becomes a physical grain of rice (0.029 grams), the numbers reveal their true physical weight.
         </p>
       </div>
 
-      {/* The Big Bold Scale Steps (Neal.fun / Paper style) */}
+      {/* The Big Bold Scale Steps (Neal.fun / Paper style: large, clean, generous breathing room) */}
       <div className="space-y-12">
         {DATA_PAPER_STEPS.map((step, idx) => (
           <div
             key={step.size}
-            className="group relative bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-xs transition-all hover:border-slate-300"
+            className="relative bg-white rounded-3xl border border-slate-200 p-8 sm:p-14 shadow-xs"
           >
-            {/* Step Number Badge */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-              <span className="font-mono text-sm font-bold text-slate-400">
-                SCALE STEP {idx + 1} OF {DATA_PAPER_STEPS.length}
+            {/* Step Number */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-8">
+              <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Step {idx + 1} of {DATA_PAPER_STEPS.length}
               </span>
-              <span className="font-mono text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+              <span className="font-mono text-xs font-semibold text-slate-500">
                 {step.bytes.toLocaleString()} Bytes
               </span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Massive Bold Headline */}
+              {/* Massive Bold Size & Icon */}
               <div className="lg:col-span-5 space-y-2">
                 <div className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight font-mono">
                   {step.size}
                 </div>
-                <div className="text-lg sm:text-xl font-bold text-indigo-600 flex items-center gap-2">
-                  <span className="text-2xl">{step.icon}</span>
+                <div className="text-lg sm:text-xl font-bold text-sky-800 flex items-center gap-2">
+                  <span className="text-3xl select-none">{step.icon}</span>
                   <span>{step.quantityTitle}</span>
                 </div>
               </div>
 
-              {/* Punchy Narrative Comparison */}
+              {/* Clean Comparison Copy */}
               <div className="lg:col-span-7 space-y-4">
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
+                <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">
                   {step.analogyHeadline}
                 </h3>
                 <p className="text-base text-slate-600 leading-relaxed">
                   {step.description}
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 font-mono text-xs">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] font-bold uppercase">PHYSICAL ANCHOR</span>
-                    <strong className="text-slate-800 text-xs block mt-0.5">{step.comparisonFact}</strong>
-                  </div>
-                  <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-100">
-                    <span className="text-indigo-600 block text-[10px] font-bold uppercase">DIGITAL EXAMPLE</span>
-                    <strong className="text-indigo-950 text-xs block mt-0.5">{step.techExample}</strong>
-                  </div>
+                <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3 font-mono text-xs text-slate-600">
+                  <span className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                    <strong>Physical:</strong> {step.comparisonFact}
+                  </span>
+                  <span className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                    <strong>Digital:</strong> {step.techExample}
+                  </span>
                 </div>
               </div>
             </div>
@@ -164,33 +162,24 @@ export default function DataPaperScale() {
         ))}
       </div>
 
-      {/* The Wi-Fi Throughput Reality Box */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-              <Wifi className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Now How Much Rice Does Your Wi-Fi Pour?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                The reason 1 Gbps internet is 125 MB/s: 8 bits equal 1 Byte.
-              </p>
-            </div>
-          </div>
-
-          <div className="font-mono text-xs px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-700 font-bold self-start md:self-auto">
-            1 Byte (B) = 8 bits (b)
-          </div>
+      {/* The Wi-Fi Rice Converter */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-xs">
+        <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+            Interactive Converter
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            How Much Rice Pours Through Your Wi-Fi?
+          </h3>
+          <p className="text-sm text-slate-600">
+            Because 1 Byte = 8 bits, 1 Gbps internet is 125 MB/s. Drag to see your plan:
+          </p>
         </div>
 
-        {/* Speed Slider */}
-        <div className="space-y-4 max-w-2xl mx-auto">
-          <div className="flex items-center justify-between text-xs font-mono font-bold">
-            <span className="text-slate-500">YOUR INTERNET PLAN:</span>
-            <span className="text-indigo-600 text-base">
+        <div className="max-w-xl mx-auto space-y-4">
+          <div className="flex items-center justify-between font-mono text-xs font-bold text-slate-700">
+            <span>PLAN SPEED:</span>
+            <span className="text-base text-sky-800">
               {userMbps >= 1000 ? `${(userMbps / 1000).toFixed(1)} Gbps` : `${userMbps} Mbps`}
             </span>
           </div>
@@ -204,32 +193,31 @@ export default function DataPaperScale() {
             onChange={(e) => {
               const val = parseInt(e.target.value, 10);
               setUserMbps(val);
-              playClick(700 + (val / 3000) * 300);
+              playClick(750 + (val / 3000) * 200);
             }}
-            className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-indigo-600"
+            className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-sky-800"
           />
 
-          <div className="flex justify-between text-[11px] font-mono text-slate-400 font-semibold">
+          <div className="flex justify-between text-[11px] font-mono text-slate-400">
             <span>50 Mbps</span>
             <span>300 Mbps (Average)</span>
-            <span>1 Gbps (Gigabit Fiber)</span>
+            <span>1 Gbps (Gigabit)</span>
             <span>3 Gbps</span>
           </div>
 
-          {/* Real-time Rice Calculation Result */}
-          <div className="p-6 rounded-3xl bg-indigo-50/60 border border-indigo-100 text-center space-y-2 mt-6">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-700">
-              At this speed, your router is dumping:
+          <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center space-y-2 mt-6">
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+              Pouring Through Your Router Every Second:
             </div>
             <div className="text-3xl sm:text-5xl font-black text-slate-900 font-mono tracking-tight">
               {tonsPerSec < 1
                 ? `${kgPerSec.toFixed(1)} kg of rice / sec`
-                : `${tonsPerSec.toFixed(2)} Metric Tons of rice / sec`}
+                : `${tonsPerSec.toFixed(2)} Metric Tons / sec`}
             </div>
-            <p className="text-sm font-semibold text-indigo-900 max-w-lg mx-auto pt-1">
+            <p className="text-sm text-slate-600 pt-1 font-medium">
               {pickupTrucksPerSec < 1
-                ? `That’s ~${(kgPerSec / 25).toFixed(1)} industrial 25kg sacks of rice pouring through your room every single second!`
-                : `That’s equal to ~${pickupTrucksPerSec.toFixed(1)} pickup trucks full of raw rice crashing onto your floor every second! 🚚`}
+                ? `That’s ~${(kgPerSec / 25).toFixed(1)} standard 25kg sacks of rice pouring into your room every single second!`
+                : `That’s equal to ~${pickupTrucksPerSec.toFixed(1)} pickup trucks full of raw rice dumping onto your floor every second! 🚚`}
             </p>
           </div>
         </div>

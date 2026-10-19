@@ -52,3 +52,28 @@ test('Continuous speeds include slow biology and light speed', () => {
   assert.ok(light);
   assert.strictEqual(light.speedMps, 299_792_458);
 });
+
+test('Printing Money stream physical rates verify against natural constants', () => {
+  // US National Debt: $82,400/sec -> annual rate:
+  const annualDebt = 82400 * 86400 * 365.25;
+  // ~$2.6 Trillion/year:
+  assert.ok(annualDebt > 2.5e12 && annualDebt < 2.7e12);
+
+  // Heart blood pump: 84 mL/sec -> time to fill 355mL soda can:
+  const secondsPerCan = 355 / 84;
+  assert.ok(Math.abs(secondsPerCan - 4.226) < 0.01);
+});
+
+test('Subsea fiber glass tax calculates 31.8% velocity reduction', () => {
+  const c = 299_792.458; // km/s
+  const n = 1.468; // silica glass refractive index
+  const vFiber = c / n;
+  assert.ok(Math.abs(vFiber - 204218.3) < 1.0);
+
+  const glassTaxPercent = (1 - vFiber / c) * 100;
+  assert.ok(Math.abs(glassTaxPercent - 31.88) < 0.1);
+
+  // Earth-Moon 384,400 km round trip radio delay:
+  const rttMoonSec = (384_400 * 2) / c;
+  assert.ok(Math.abs(rttMoonSec - 2.564) < 0.01);
+});
