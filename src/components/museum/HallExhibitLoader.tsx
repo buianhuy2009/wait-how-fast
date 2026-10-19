@@ -7,7 +7,9 @@ import SoundVsLightShowdown from '@/components/exhibits/SoundVsLightShowdown';
 import AnimalSpeedOlympics from '@/components/exhibits/AnimalSpeedOlympics';
 import LatencyArcade from '@/components/exhibits/LatencyArcade';
 import DataFlood from '@/components/exhibits/DataFlood';
+import DataPaperScale from '@/components/exhibits/DataPaperScale';
 import CpuTimeDilation from '@/components/exhibits/CpuTimeDilation';
+import CpuPaperScale from '@/components/exhibits/CpuPaperScale';
 import FrameRateVault from '@/components/exhibits/FrameRateVault';
 import HumanSpeedVault from '@/components/exhibits/HumanSpeedVault';
 import CosmicVault from '@/components/exhibits/CosmicVault';
@@ -29,13 +31,28 @@ function ExhibitContent({ slug }: { slug: string }) {
         </div>
       );
     case 'biology':
-      return <HumanSpeedVault key="biology" />;
+      return (
+        <div className="space-y-16">
+          <AnimalSpeedOlympics />
+          <HumanSpeedVault key="biology" />
+        </div>
+      );
     case 'latency':
       return <LatencyArcade key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
     case 'data':
-      return <DataFlood key={`${sizeParam || '1gb'}-${analogyParam || 'rice'}`} initialSizeId={sizeParam || '1gb'} initialAnalogyId={analogyParam || 'rice'} />;
+      return (
+        <div className="space-y-16">
+          <DataPaperScale />
+          <DataFlood key={`${sizeParam || '1gb'}-${analogyParam || 'rice'}`} initialSizeId={sizeParam || '1gb'} initialAnalogyId={analogyParam || 'rice'} />
+        </div>
+      );
     case 'cpu':
-      return <CpuTimeDilation key={exhibitParam || 'default'} initialOpId={exhibitParam || 'main-ram'} />;
+      return (
+        <div className="space-y-16">
+          <CpuPaperScale />
+          <CpuTimeDilation key={exhibitParam || 'default'} initialOpId={exhibitParam || 'main-ram'} />
+        </div>
+      );
     case 'framerate':
       return <FrameRateVault key="framerate" />;
     case 'cosmic':

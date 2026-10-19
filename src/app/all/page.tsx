@@ -6,7 +6,9 @@ import AnimalSpeedOlympics from '@/components/exhibits/AnimalSpeedOlympics';
 import HumanSpeedVault from '@/components/exhibits/HumanSpeedVault';
 import LatencyArcade from '@/components/exhibits/LatencyArcade';
 import DataFlood from '@/components/exhibits/DataFlood';
+import DataPaperScale from '@/components/exhibits/DataPaperScale';
 import CpuTimeDilation from '@/components/exhibits/CpuTimeDilation';
+import CpuPaperScale from '@/components/exhibits/CpuPaperScale';
 import FrameRateVault from '@/components/exhibits/FrameRateVault';
 import CosmicVault from '@/components/exhibits/CosmicVault';
 import RealtimeAccumulator from '@/components/museum/RealtimeAccumulator';
@@ -26,7 +28,7 @@ export default function GrandWalkthrough() {
     { id: 'wing-1', title: 'Wing 01: Speed Track', icon: Gauge, color: 'text-emerald-500' },
     { id: 'wing-2', title: 'Wing 02: Speed of You', icon: Heart, color: 'text-rose-500' },
     { id: 'wing-3', title: 'Wing 03: Latency Arcade', icon: Radio, color: 'text-cyan-500' },
-    { id: 'wing-4', title: 'Wing 04: The Data Flood', icon: HardDrive, color: 'text-indigo-500' },
+    { id: 'wing-4', title: 'Wing 04: Scale of Data', icon: HardDrive, color: 'text-indigo-500' },
     { id: 'wing-5', title: 'Wing 05: Inside Your CPU', icon: Cpu, color: 'text-purple-500' },
     { id: 'wing-6', title: 'Wing 06: Refresh Vault', icon: Activity, color: 'text-amber-500' },
     { id: 'wing-7', title: 'Wing 07: Cosmic Vault', icon: Sparkles, color: 'text-violet-500' },
@@ -83,28 +85,28 @@ export default function GrandWalkthrough() {
         <div className="pt-8">
           <SoundVsLightShowdown />
         </div>
-        <div className="pt-8">
-          <AnimalSpeedOlympics />
-        </div>
       </section>
 
       {/* Wing 2 */}
       <section id="wing-2" className="scroll-mt-24 space-y-4 pt-12 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 text-rose-500 font-mono text-xs font-bold uppercase tracking-wider">
           <Heart className="w-4 h-4" />
-          <span>Wing 02 &bull; The Speed of You (Human Biology & Reflex Lab)</span>
+          <span>Wing 02 &bull; Biology Speed Olympics &amp; Reflex Lab</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-          The Hidden Velocities of Your Body
+          The Hidden Velocities of Biology &amp; The Human Body
         </h2>
-        <HumanSpeedVault />
+        <AnimalSpeedOlympics />
+        <div className="pt-8">
+          <HumanSpeedVault />
+        </div>
       </section>
 
       {/* Wing 3 */}
       <section id="wing-3" className="scroll-mt-24 space-y-4 pt-12 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 text-cyan-500 font-mono text-xs font-bold uppercase tracking-wider">
           <Radio className="w-4 h-4" />
-          <span>Wing 03 &bull; The Latency & Ping Arcade</span>
+          <span>Wing 03 &bull; The Latency &amp; Ping Arcade</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
           Feel the Speed-of-Light Lag Across Earth and Space
@@ -116,34 +118,40 @@ export default function GrandWalkthrough() {
       <section id="wing-4" className="scroll-mt-24 space-y-4 pt-12 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 text-indigo-500 font-mono text-xs font-bold uppercase tracking-wider">
           <HardDrive className="w-4 h-4" />
-          <span>Wing 04 &bull; The Data Flood</span>
+          <span>Wing 04 &bull; The Scale of Data (Rich Vector Illustrations)</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
           Bits vs. Bytes as Physical Matter
         </h2>
-        <DataFlood />
+        <DataPaperScale />
+        <div className="pt-8">
+          <DataFlood />
+        </div>
       </section>
 
       {/* Wing 5 */}
       <section id="wing-5" className="scroll-mt-24 space-y-4 pt-12 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 text-purple-500 font-mono text-xs font-bold uppercase tracking-wider">
           <Cpu className="w-4 h-4" />
-          <span>Wing 05 &bull; Inside Your CPU (Time Dilation Chamber)</span>
+          <span>Wing 05 &bull; Inside Your CPU (Why Is Your Computer Waiting?)</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-          If 1 Nanosecond = 1 Human Second
+          Why Is Your Computer Waiting? (If 1 CPU Tick = 1 Human Second)
         </h2>
-        <CpuTimeDilation />
+        <CpuPaperScale />
+        <div className="pt-8">
+          <CpuTimeDilation />
+        </div>
       </section>
 
       {/* Wing 6 */}
       <section id="wing-6" className="scroll-mt-24 space-y-4 pt-12 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 text-amber-500 font-mono text-xs font-bold uppercase tracking-wider">
           <Activity className="w-4 h-4" />
-          <span>Wing 06 &bull; The Refresh & Frame Rate Vault</span>
+          <span>Wing 06 &bull; The Refresh &amp; Frame Rate Vault</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-          The Neuroscience of Display Refresh & Persistence
+          The Neuroscience of Display Refresh &amp; Persistence
         </h2>
         <FrameRateVault />
       </section>
@@ -155,7 +163,7 @@ export default function GrandWalkthrough() {
           <span>Wing 07 &bull; The Cosmic Vault</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-          Planetary, Galactic & Interstellar Velocities
+          Planetary, Galactic &amp; Interstellar Velocities
         </h2>
         <CosmicVault />
       </section>

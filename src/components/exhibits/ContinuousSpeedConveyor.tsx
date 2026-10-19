@@ -360,9 +360,20 @@ export default function ContinuousSpeedConveyor() {
 
         // Calculate velocity
         let pxPerSec = 0;
+        const isSpeedOfLight = item.speedMps >= 200_000_000;
+        const isSupersonicSound = item.speedMps >= 300 && item.speedMps < 1000;
+
         if (motionMode === 'literal') {
-          pxPerSec = velocityToPxPerSec(item.speedMps, ppi, 1.0, 1.0);
-          if (pxPerSec > 2200) pxPerSec = 2200;
+          if (isSpeedOfLight) {
+            // Light traverses screen in ~1 nanosecond (effectively continuous beam)
+            pxPerSec = 3500;
+          } else if (isSupersonicSound) {
+            // Sound traverses screen in ~0.87 milliseconds
+            pxPerSec = 2200;
+          } else {
+            pxPerSec = velocityToPxPerSec(item.speedMps, ppi, 1.0, 1.0);
+            if (pxPerSec > 1800) pxPerSec = 1800;
+          }
         } else {
           // Observable View
           if (item.speedMps < 1e-4) {
@@ -387,7 +398,7 @@ export default function ContinuousSpeedConveyor() {
           } else if (item.speedMps < 1000.0) {
             pxPerSec = 750; // Sound
           } else {
-            pxPerSec = 1400; // Cosmic / Light
+            pxPerSec = 1800; // Cosmic / Light (distinct from Sound)
           }
         }
 
@@ -414,12 +425,19 @@ export default function ContinuousSpeedConveyor() {
           ctx.beginPath();
           ctx.arc(objectX, centerY, 18, 0, Math.PI * 2);
           ctx.fill();
+        } else if (item.id === 'speed-of-sound' || item.id === 'sound-wave') {
+          // Mach cone shockwave ripple behind sound
+          ctx.strokeStyle = 'rgba(37, 99, 235, 0.4)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(objectX - 10, centerY, 14, -Math.PI * 0.4, Math.PI * 0.4);
+          ctx.stroke();
         } else if (item.id === 'speed-of-light' || item.id === 'light-vacuum') {
-          // Laser beam streak
-          const beamLen = 70;
+          // Laser beam streak across the belt
+          const beamLen = motionMode === 'literal' ? conveyorActiveWidth : 120;
           const grad = ctx.createLinearGradient(objectX - beamLen, centerY, objectX, centerY);
           grad.addColorStop(0, 'rgba(147, 51, 234, 0)');
-          grad.addColorStop(1, 'rgba(147, 51, 234, 0.8)');
+          grad.addColorStop(1, 'rgba(147, 51, 234, 0.85)');
           ctx.fillStyle = grad;
           ctx.fillRect(Math.max(conveyorLeft, objectX - beamLen), centerY - 2, beamLen, 4);
         }

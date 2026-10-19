@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useSound } from '@/context/SoundContext';
-import { Trophy, Play, RotateCcw, Flame } from 'lucide-react';
+import { Trophy, Play, RotateCcw, Flame, Sprout, Zap, Pause } from 'lucide-react';
 
 interface AnimalCompetitor {
   id: string;
@@ -26,7 +26,7 @@ interface AnimalCompetitor {
 const OLYMPIC_ANIMALS: AnimalCompetitor[] = [
   {
     id: 'peregrine-falcon',
-    name: 'Peregrine Falcon (Dive)',
+    name: 'Peregrine Falcon (Stoop Dive)',
     scientificName: 'Falco peregrinus',
     category: 'Aerial Predator',
     speedMps: 108.0,
@@ -62,14 +62,14 @@ const OLYMPIC_ANIMALS: AnimalCompetitor[] = [
   },
   {
     id: 'mantis-shrimp',
-    name: 'Mantis Shrimp (Punch)',
+    name: 'Mantis Shrimp (Punch Velocity)',
     scientificName: 'Odontodactylus scyllarus',
     category: 'Hyper-Strike',
     speedMps: 23.0,
     speedKmh: 83.0,
     speedMph: 51.0,
     time100mSec: 4.35,
-    time100mDisplay: '4.35s (Punch in 0.002s!)',
+    time100mDisplay: '4.35s (2 ms strike!)',
     accelerationG: '10,400 G (Bullet acceleration)',
     icon: '🦐',
     color: '#ea580c',
@@ -116,7 +116,7 @@ const OLYMPIC_ANIMALS: AnimalCompetitor[] = [
   },
   {
     id: 'bamboo',
-    name: 'Timber Bamboo (Growth)',
+    name: 'Timber Bamboo (Growth Rate)',
     scientificName: 'Phyllostachys reticulata',
     category: 'Botanical Record',
     speedMps: 0.0000116,
@@ -129,21 +129,32 @@ const OLYMPIC_ANIMALS: AnimalCompetitor[] = [
     color: '#059669',
     trackBg: '#d1fae5',
     superpower: 'Fastest-growing plant on Earth (up to 100 cm in 24 hours).',
-    bioDetail: 'Surges 11.6 micrometers every single second through rapid telescoping internode cell expansion. You can visibly watch it grow against a ruler!',
+    bioDetail: 'Surges 11.6 micrometers every single second through rapid telescoping internode cell expansion. You can visibly watch it grow against a ruler in time-lapse!',
     citation: 'Guinness World Records / Farrelly (Book of Bamboo)',
   },
 ];
 
 export default function AnimalSpeedOlympics() {
-  const { playClick, playChime } = useSound();
+  const { playClick, playChime, playBuzz } = useSound();
 
+  // 100m Race Track State
   const [isRacing, setIsRacing] = useState<boolean>(false);
   const [raceElapsedSec, setRaceElapsedSec] = useState<number>(0);
   const [selectedAnimal, setSelectedAnimal] = useState<AnimalCompetitor>(OLYMPIC_ANIMALS[0]);
   const [dualOpponent, setDualOpponent] = useState<AnimalCompetitor>(OLYMPIC_ANIMALS[3]); // Usain Bolt
-
   const raceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Bamboo Time-Lapse Chamber State
+  const [bambooHours, setBambooHours] = useState<number>(6.0); // 0 to 24 hours
+  const [isTimelapseRunning, setIsTimelapseRunning] = useState<boolean>(false);
+  const [timelapseSpeed, setTimelapseSpeed] = useState<number>(3600); // 3600x = 1s is 1 hr
+  const timelapseTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Mantis Shrimp Cavitation Punch State
+  const [isStriking, setIsStriking] = useState<boolean>(false);
+  const [cavitationBubble, setCavitationBubble] = useState<boolean>(false);
+
+  // 100m Race Controls
   const startRace = () => {
     if (isRacing) {
       if (raceTimerRef.current) clearInterval(raceTimerRef.current);
@@ -159,7 +170,6 @@ export default function AnimalSpeedOlympics() {
     const interval = setInterval(() => {
       setRaceElapsedSec((prev) => {
         const next = prev + stepMs / 1000;
-        // End simulation after 10 seconds (enough for Usain Bolt to finish)
         if (next >= 10.0) {
           clearInterval(interval);
           setIsRacing(false);
@@ -180,11 +190,69 @@ export default function AnimalSpeedOlympics() {
     setRaceElapsedSec(0);
   };
 
+  // Bamboo Time-Lapse Controls
+  const toggleBambooTimelapse = () => {
+    if (isTimelapseRunning) {
+      if (timelapseTimerRef.current) clearInterval(timelapseTimerRef.current);
+      setIsTimelapseRunning(false);
+      return;
+    }
+
+    playClick(850);
+    setIsTimelapseRunning(true);
+
+    const stepMs = 50;
+    const interval = setInterval(() => {
+      setBambooHours((prev) => {
+        // At 3600x speed: 1 second = 1 hour, so 50ms = 0.05 hours
+        const hoursDelta = (stepMs / 1000) * (timelapseSpeed / 3600);
+        const next = prev + hoursDelta;
+        if (next >= 24.0) {
+          clearInterval(interval);
+          setIsTimelapseRunning(false);
+          playChime();
+          return 24.0;
+        }
+        return next;
+      });
+    }, stepMs);
+
+    timelapseTimerRef.current = interval;
+  };
+
+  const resetBamboo = () => {
+    playClick(600);
+    if (timelapseTimerRef.current) clearInterval(timelapseTimerRef.current);
+    setIsTimelapseRunning(false);
+    setBambooHours(0);
+  };
+
+  // Mantis Shrimp Punch Trigger
+  const triggerMantisPunch = () => {
+    playClick(1000);
+    setIsStriking(true);
+    setCavitationBubble(true);
+    playBuzz();
+
+    setTimeout(() => {
+      setCavitationBubble(false);
+    }, 300);
+
+    setTimeout(() => {
+      setIsStriking(false);
+    }, 700);
+  };
+
   useEffect(() => {
     return () => {
       if (raceTimerRef.current) clearInterval(raceTimerRef.current);
+      if (timelapseTimerRef.current) clearInterval(timelapseTimerRef.current);
     };
   }, []);
+
+  // Bamboo Height calculation: 100 cm in 24 hours = 4.1667 cm/hr
+  const bambooHeightCm = bambooHours * 4.166667;
+  const bambooGrowthMeters = bambooHeightCm / 100;
 
   return (
     <div className="w-full space-y-12">
@@ -192,13 +260,13 @@ export default function AnimalSpeedOlympics() {
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-900 border border-emerald-200">
           <Trophy className="w-3.5 h-3.5 text-emerald-600" />
-          <span>New Museum Exhibition &bull; Biology Speed Olympics</span>
+          <span>New Museum Wing &bull; Biology Speed Olympics</span>
         </div>
         <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           The Animal Kingdom Speed Olympics
         </h2>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-          From the 10,400 G bullet punch of the mantis shrimp to the 389 km/h stoop dive of the peregrine falcon, watch biology’s greatest speed champions race on a 100-meter track!
+          From the 10,400 G bullet punch of the mantis shrimp to the 389 km/h stoop dive of the peregrine falcon, watch biology’s greatest speed champions race on a 100-meter track and inspect time-lapse plant growth!
         </p>
       </div>
 
@@ -214,7 +282,7 @@ export default function AnimalSpeedOlympics() {
               Who Reaches the 100-Meter Finish Line First?
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Watch them sprint side-by-side in real-time. Notice how falcon & cheetah vanish into the distance!
+              Watch them sprint side-by-side in real-time. Notice how falcon &amp; cheetah vanish into the distance!
             </p>
           </div>
 
@@ -247,15 +315,14 @@ export default function AnimalSpeedOlympics() {
           <span className="text-lg font-black text-emerald-600">
             {raceElapsedSec.toFixed(2)}s
           </span>
-          <span className="text-slate-400">
-            {raceElapsedSec >= 9.58 ? '🏁 Usain Bolt Finished!' : raceElapsedSec >= 3.0 ? '🐆 Cheetah Finished!' : raceElapsedSec >= 0.93 ? '🦅 Falcon Finished!' : 'Racing...'}
+          <span className="text-slate-500 font-bold">
+            {raceElapsedSec >= 9.58 ? '🏁 Usain Bolt Finished!' : raceElapsedSec >= 4.35 ? '🦐 Mantis Punch Distance Met!' : raceElapsedSec >= 3.0 ? '🐆 Cheetah Finished!' : raceElapsedSec >= 0.93 ? '🦅 Falcon Finished!' : 'Racing...'}
           </span>
         </div>
 
         {/* The 6 Lanes Track */}
         <div className="space-y-3">
           {OLYMPIC_ANIMALS.map((animal, idx) => {
-            // Calculate progress along 100m track
             const currentMeters = Math.min(100, raceElapsedSec * animal.speedMps);
             const progressPercent = (currentMeters / 100) * 100;
             const hasFinished = raceElapsedSec >= animal.time100mSec && animal.time100mSec <= 10.0;
@@ -295,7 +362,6 @@ export default function AnimalSpeedOlympics() {
 
                 {/* Track Lane Bar */}
                 <div className="relative w-full h-8 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center">
-                  {/* Metric Markers */}
                   <div className="absolute inset-0 flex justify-between px-3 text-[9px] font-mono text-slate-400 pointer-events-none items-center">
                     <span>START (0m)</span>
                     <span>25m</span>
@@ -304,7 +370,6 @@ export default function AnimalSpeedOlympics() {
                     <span className="text-rose-500 font-bold">FINISH (100m)</span>
                   </div>
 
-                  {/* Filled track progress */}
                   <div
                     className="h-full opacity-35 transition-all duration-75"
                     style={{
@@ -313,7 +378,6 @@ export default function AnimalSpeedOlympics() {
                     }}
                   />
 
-                  {/* Competitor Avatar Pin on Track */}
                   <div
                     className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-75 flex items-center justify-center text-lg select-none drop-shadow-xs"
                     style={{ left: `${Math.max(3, Math.min(97, progressPercent))}%` }}
@@ -321,7 +385,6 @@ export default function AnimalSpeedOlympics() {
                     {animal.icon}
                   </div>
 
-                  {/* Finished Stamp */}
                   {hasFinished && (
                     <div className="absolute right-3 px-2 py-0.5 rounded-md bg-emerald-600 text-white font-mono text-[10px] font-bold shadow-xs">
                       FINISHED &bull; {animal.time100mSec}s
@@ -331,6 +394,235 @@ export default function AnimalSpeedOlympics() {
               </div>
             );
           })}
+        </div>
+
+        {/* Mantis Shrimp Footnote & Cavitation Effect */}
+        <div className="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 font-medium relative overflow-hidden">
+          {cavitationBubble && (
+            <div className="absolute inset-0 bg-amber-400/25 animate-ping pointer-events-none" />
+          )}
+          <div className="flex items-center gap-2 relative z-10">
+            <Zap className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>
+              <strong>Physics Note on Mantis Shrimp:</strong> The punch velocity of 23 m/s accelerates at 10,400 G over 5 mm in just 2 milliseconds.
+              {cavitationBubble && (
+                <span className="text-orange-600 font-bold ml-2">💥 Cavitation bubble collapsed at 4,700°C!</span>
+              )}
+            </span>
+          </div>
+          <button
+            onClick={triggerMantisPunch}
+            className="px-3 py-1.5 rounded-xl bg-amber-200/90 hover:bg-amber-200 text-amber-950 font-bold text-xs font-mono shrink-0 transition-colors relative z-10"
+          >
+            {isStriking ? '💥 CAVITATING!' : 'Trigger 2ms Strike!'}
+          </button>
+        </div>
+      </div>
+
+      {/* FEATURE: The Bamboo Time-Lapse Growth Chamber (1 Meter per Day) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-2">
+              <Sprout className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Visible Plant Growth Chamber</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Watch Timber Bamboo Grow 1 Meter in 24 Hours
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
+              Unlike normal plants that grow invisibly, timber bamboo surges <strong>11.6 micrometers every single second</strong> (up to 100 cm in a day). Watch it visibly shoot up against the metric ruler in time-lapse:
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleBambooTimelapse}
+              className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs font-mono shadow-md transition-all active:scale-95 ${
+                isTimelapseRunning
+                  ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-500'
+              }`}
+            >
+              {isTimelapseRunning ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+              <span>{isTimelapseRunning ? 'PAUSE TIME-LAPSE' : 'PLAY TIME-LAPSE'}</span>
+            </button>
+
+            <button
+              onClick={resetBamboo}
+              className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition-colors"
+              title="Reset Bamboo"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Time-lapse Speed Selector */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+            <button
+              onClick={() => setTimelapseSpeed(100)}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${timelapseSpeed === 100 ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500'}`}
+            >
+              100x Speed
+            </button>
+            <button
+              onClick={() => setTimelapseSpeed(1000)}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${timelapseSpeed === 1000 ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500'}`}
+            >
+              1,000x Speed
+            </button>
+            <button
+              onClick={() => setTimelapseSpeed(3600)}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${timelapseSpeed === 3600 ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500'}`}
+            >
+              3,600x (1s = 1hr)
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 text-slate-700">
+            <span>
+              Time Elapsed: <strong className="text-emerald-700 text-sm font-black">{bambooHours.toFixed(1)} Hours</strong>
+            </span>
+            <span>
+              Height Reached: <strong className="text-emerald-700 text-sm font-black">{bambooHeightCm.toFixed(1)} cm ({bambooGrowthMeters.toFixed(3)} m)</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* The Growth Visual Chamber */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          {/* Left: Interactive Vertical Growth Ruler SVG */}
+          <div className="md:col-span-5 h-72 sm:h-80 flex items-center justify-center bg-white rounded-2xl border border-slate-200 p-4 shadow-inner">
+            <svg viewBox="0 0 200 300" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Soil Bed */}
+              <rect x="20" y="270" width="160" height="25" rx="4" fill="#78350f" />
+              <text x="100" y="286" textAnchor="middle" fill="#fef3c7" fontSize="8" fontFamily="monospace" fontWeight="bold">FERTILE SOIL</text>
+
+              {/* Vertical Metric Ruler on Left */}
+              <line x1="45" y1="30" x2="45" y2="270" stroke="#94a3b8" strokeWidth="2" />
+              {/* Ruler notches */}
+              {[
+                { cm: 100, y: 30, label: '100 cm (1m)' },
+                { cm: 75, y: 90, label: '75 cm' },
+                { cm: 50, y: 150, label: '50 cm' },
+                { cm: 25, y: 210, label: '25 cm' },
+                { cm: 0, y: 270, label: '0 cm' },
+              ].map((tick) => (
+                <g key={tick.cm}>
+                  <line x1="38" y1={tick.y} x2="45" y2={tick.y} stroke="#64748b" strokeWidth="1.5" />
+                  <text x="34" y={tick.y + 3} textAnchor="end" fill="#64748b" fontSize="7" fontFamily="monospace">
+                    {tick.label}
+                  </text>
+                </g>
+              ))}
+
+              {/* Bamboo Shoot Culm (height grows upward from y=270 to y=30) */}
+              {(() => {
+                const maxPx = 240; // 270 - 30
+                const currentHeightPx = (bambooHeightCm / 100) * maxPx;
+                const topY = 270 - currentHeightPx;
+
+                return (
+                  <g>
+                    {/* Bamboo Stalk Body */}
+                    <rect
+                      x="90"
+                      y={topY}
+                      width="20"
+                      height={currentHeightPx}
+                      rx="3"
+                      fill="#10b981"
+                      stroke="#047857"
+                      strokeWidth="1.5"
+                    />
+
+                    {/* Bamboo Node Rings */}
+                    {[0.25, 0.5, 0.75].map((pct) => {
+                      const ringY = 270 - currentHeightPx * pct;
+                      if (currentHeightPx > 40 && ringY > topY && ringY < 265) {
+                        return (
+                          <g key={pct}>
+                            <line x1="88" y1={ringY} x2="112" y2={ringY} stroke="#065f46" strokeWidth="2" />
+                            {/* Sprouting side leaf */}
+                            <path d={`M112 ${ringY} Q125 ${ringY - 10} 130 ${ringY - 5} Q122 ${ringY} 112 ${ringY}`} fill="#34d399" />
+                          </g>
+                        );
+                      }
+                      return null;
+                    })}
+
+                    {/* Sprout Tip */}
+                    <path
+                      d={`M90 ${topY} Q100 ${topY - 12} 110 ${topY} Z`}
+                      fill="#34d399"
+                      stroke="#059669"
+                      strokeWidth="1"
+                    />
+
+                    {/* Current Height Indicator Marker */}
+                    <line x1="45" y1={topY} x2="90" y2={topY} stroke="#ea580c" strokeWidth="1.5" strokeDasharray="2 2" />
+                    <circle cx="90" cy={topY} r="3" fill="#ea580c" />
+                    <text x="135" y={topY + 3} fill="#ea580c" fontSize="8" fontFamily="monospace" fontWeight="bold">
+                      {bambooHeightCm.toFixed(1)} cm
+                    </text>
+                  </g>
+                );
+              })()}
+            </svg>
+          </div>
+
+          {/* Right: Milestone Scale Details */}
+          <div className="md:col-span-7 space-y-4">
+            <h4 className="text-xl font-bold text-slate-900">
+              {bambooHours >= 24
+                ? '🎉 24 Hours Complete: 1 Full Meter Tall!'
+                : bambooHours >= 12
+                ? '🌿 12 Hours: 50 cm Tall (Bowling Pin Height)'
+                : bambooHours >= 6
+                ? '🌱 6 Hours: 25 cm Tall (Wine Bottle Height)'
+                : '🎋 Sprouting: 11.6 Micrometers Every Second'}
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Bamboo does not grow by cellular division at the very tip like a tree branch. Instead, every single internode along the entire stem elongates simultaneously like a collapsible telescoping telescope!
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 font-mono text-xs pt-2">
+              <div className="p-3 rounded-xl bg-white border border-slate-200">
+                <span className="text-[10px] text-slate-400 block uppercase">Instantaneous Velocity</span>
+                <strong className="text-sm font-black text-emerald-700">11.6 µm / second</strong>
+                <span className="text-[10px] text-slate-500 block">4.17 cm / hour</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-white border border-slate-200">
+                <span className="text-[10px] text-slate-400 block uppercase">Telescoping Cells</span>
+                <strong className="text-sm font-black text-emerald-700">All internodes expand</strong>
+                <span className="text-[10px] text-slate-500 block">Simultaneous surge</span>
+              </div>
+            </div>
+
+            {/* Slider to scrub hours manually */}
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between font-mono text-xs text-slate-600 font-bold">
+                <span>MANUAL SCRUBBER:</span>
+                <span className="text-emerald-700">{bambooHours.toFixed(1)} / 24.0 Hours</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="24"
+                step="0.5"
+                value={bambooHours}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setBambooHours(val);
+                  setIsTimelapseRunning(false);
+                }}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-emerald-600"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

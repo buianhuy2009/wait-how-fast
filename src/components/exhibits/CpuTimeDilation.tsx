@@ -96,7 +96,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
       {/* Upper Selector Grid: Computer Operations */}
       <div className="flex flex-col gap-2">
         <span className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
-          SELECT CPU HARDWARE OPERATION (1 NS = 1 HUMAN SECOND):
+          SELECT CPU HARDWARE OPERATION (IF 1 CPU TICK = 1 HUMAN SECOND):
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-9 gap-2">
           {CPU_OPERATIONS.map((op) => {

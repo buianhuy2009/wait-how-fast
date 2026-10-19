@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSound } from '@/context/SoundContext';
-import { Zap, Volume2, Globe, Sparkles, Info } from 'lucide-react';
+import { Zap, Volume2, Globe, Sparkles, Info, ZoomIn, Eye, Monitor } from 'lucide-react';
 
 export default function SoundVsLightShowdown() {
   const { playClick, playLightning, playThunder } = useSound();
@@ -17,6 +17,7 @@ export default function SoundVsLightShowdown() {
   // Speed constants
   const SPEED_OF_SOUND_MPS = 343; // 343 m/s in air at 20°C
   const SPEED_OF_LIGHT_MPS = 299_792_458; // 300,000 km/s
+  const EXACT_RATIO = SPEED_OF_LIGHT_MPS / SPEED_OF_SOUND_MPS; // ~874,030.5x
 
   const distanceMeters = distanceKm * 1000;
   const lightArrivalSeconds = distanceMeters / SPEED_OF_LIGHT_MPS; // ~3.33 microseconds for 1 km
@@ -26,34 +27,15 @@ export default function SoundVsLightShowdown() {
   const strikeStartTimestampRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Scale zoomer state
-  const [scaleZoom, setScaleZoom] = useState<number>(1); // 1 to 1000
+  // Experiment 3: Scale comparator mode and state
+  const [comparatorMode, setComparatorMode] = useState<'macro' | 'micro'>('macro');
+  const [soundPx, setSoundPx] = useState<number>(2); // 1 to 40 px
+  const [panKm, setPanKm] = useState<number>(343 / 1000); // Pan position along 300,000 km
 
-  // 1-Second Earth Orbit visual animation phase
-  const [earthRotation, setEarthRotation] = useState<number>(0);
-  const [lightOrbitAngle, setLightOrbitAngle] = useState<number>(0);
-  const isOrbiting = true;
-
-  // 1-second simulation loop for Earth light orbits
-  useEffect(() => {
-    let animId: number;
-    let lastT = performance.now();
-
-    const loop = (now: number) => {
-      const dt = (now - lastT) / 1000;
-      lastT = now;
-
-      if (isOrbiting) {
-        setEarthRotation((prev) => (prev + dt * 10) % 360);
-        // Light circles Earth 7.5 times per second = 7.5 * 360 = 2700 deg/sec
-        setLightOrbitAngle((prev) => (prev + dt * 2700) % 360);
-      }
-      animId = requestAnimationFrame(loop);
-    };
-
-    animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
-  }, [isOrbiting]);
+  // Calculations for Scale Comparator
+  const lightBarPixels = Math.round(soundPx * EXACT_RATIO);
+  const monitorsNeeded = Math.round(lightBarPixels / 1920);
+  const streetDistanceKm = (monitorsNeeded * 0.5) / 1000; // 0.5m monitor width
 
   // Handle Lightning Strike Trigger
   const triggerLightning = useCallback(() => {
@@ -143,12 +125,12 @@ export default function SoundVsLightShowdown() {
     const observerX = w - 70;
     const observerY = h - 36;
 
-    // Draw Observer Person / Station on right
+    // Draw Observer Person on right
     ctx.fillStyle = '#f8fafc';
     ctx.beginPath();
-    ctx.arc(observerX, observerY - 26, 7, 0, Math.PI * 2); // head
+    ctx.arc(observerX, observerY - 26, 7, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillRect(observerX - 4, observerY - 19, 8, 14); // body
+    ctx.fillRect(observerX - 4, observerY - 19, 8, 14);
     ctx.fillStyle = '#38bdf8';
     ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'center';
@@ -202,7 +184,6 @@ export default function SoundVsLightShowdown() {
       const totalSpan = observerX - strikeX;
       const currentRadius = soundProgress * totalSpan;
 
-      // Sound shockwave arcs expanding toward observer
       ctx.save();
       ctx.beginPath();
       ctx.arc(strikeX, strikeY - 10, currentRadius, -Math.PI * 0.45, Math.PI * 0.45);
@@ -212,7 +193,6 @@ export default function SoundVsLightShowdown() {
       ctx.shadowBlur = 12;
       ctx.stroke();
 
-      // Outer secondary ripple
       if (currentRadius > 20) {
         ctx.beginPath();
         ctx.arc(strikeX, strikeY - 10, Math.max(0, currentRadius - 18), -Math.PI * 0.45, Math.PI * 0.45);
@@ -222,7 +202,6 @@ export default function SoundVsLightShowdown() {
       }
       ctx.restore();
 
-      // Sound packet position indicator
       const frontX = strikeX + currentRadius;
       ctx.fillStyle = strikeState === 'arrived' ? '#ef4444' : '#38bdf8';
       ctx.font = 'bold 10px monospace';
@@ -242,11 +221,23 @@ export default function SoundVsLightShowdown() {
 
   return (
     <div className="w-full space-y-12">
+      {/* CSS Keyframes for GPU-accelerated Earth and photon animations (no React re-renders) */}
+      <style jsx global>{`
+        @keyframes spinEarthGpu {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes orbitPhotonGpu {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-50 text-amber-900 border border-amber-200">
           <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          <span>True-Scale Physics Showdown &bull; 874,000&times; Gap</span>
+          <span>True-Scale Physics Showdown &bull; 874,030.5&times; Gap</span>
         </div>
         <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           Speed of Light vs. Speed of Sound
@@ -423,12 +414,11 @@ export default function SoundVsLightShowdown() {
             </div>
 
             <p className="text-xs text-slate-600">
-              Equivalent to 3.5 American football fields or 1 full outdoor track lap.
+              Equivalent to 3.5 American football fields or 1 full outdoor stadium track lap.
             </p>
 
             {/* Stadium Visual Diagram */}
             <div className="relative w-full h-32 rounded-xl bg-emerald-950 border border-emerald-800 p-4 flex flex-col justify-between overflow-hidden">
-              {/* Running track lanes */}
               <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
                 backgroundImage: 'repeating-linear-gradient(90deg, #10b981 0, #10b981 1px, transparent 0, transparent 40px)',
               }} />
@@ -439,7 +429,6 @@ export default function SoundVsLightShowdown() {
                 <span>FINISH (343m)</span>
               </div>
 
-              {/* Sound wave dot moving */}
               <div className="relative w-full h-4 bg-emerald-900/60 rounded-full overflow-hidden border border-emerald-700 z-10">
                 <div className="h-full bg-cyan-400 animate-pulse rounded-full" style={{ width: '100%' }} />
               </div>
@@ -467,12 +456,12 @@ export default function SoundVsLightShowdown() {
               In that same 1 second, light wraps around the entire Earth <strong>7.5 times</strong>!
             </p>
 
-            {/* Earth Orbit SVG Visualizer */}
+            {/* Earth Orbit SVG Visualizer with GPU CSS Animation */}
             <div className="relative w-full h-32 rounded-xl bg-[#030712] border border-slate-800 flex items-center justify-center overflow-hidden">
-              {/* Globe */}
+              {/* Globe spinning on GPU */}
               <div
                 className="relative w-20 h-20 rounded-full border-2 border-cyan-500/50 bg-gradient-to-br from-blue-600 via-indigo-900 to-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20"
-                style={{ transform: `rotate(${earthRotation}deg)` }}
+                style={{ animation: 'spinEarthGpu 36s linear infinite' }}
               >
                 <Globe className="w-12 h-12 text-cyan-200/80" />
               </div>
@@ -482,12 +471,12 @@ export default function SoundVsLightShowdown() {
                 className="absolute w-28 h-28 rounded-full border border-purple-500/30"
                 style={{ transform: 'rotate(25deg)' }}
               >
-                {/* Orbiting Photon packet */}
+                {/* Orbiting Photon packet running on GPU at 7.5 laps/sec (133ms) */}
                 <div
                   className="absolute w-3 h-3 rounded-full bg-yellow-300 shadow-lg shadow-yellow-300/80 -top-1.5 left-1/2 -translate-x-1/2"
                   style={{
                     transformOrigin: '0 56px',
-                    transform: `rotate(${lightOrbitAngle}deg)`,
+                    animation: 'orbitPhotonGpu 0.1333s linear infinite',
                   }}
                 />
               </div>
@@ -500,80 +489,230 @@ export default function SoundVsLightShowdown() {
         </div>
       </div>
 
-      {/* Feature 3: The 874,000x Honest Screen Pixel Comparator */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs">
-        <div className="pb-6 border-b border-slate-100 mb-6">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-            Interactive Experiment 03 &bull; True Visual Screen Scale
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-            If Sound Was 1 Pixel Wide, How Wide Would Light Be?
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-            If Sound in 1 millisecond (34.3 cm) is represented by <strong>1 single pixel</strong> on your screen, Light in that same millisecond is <strong>874,030 pixels wide</strong>—requiring 455 monitors lined up down your street!
-          </p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Zoom Slider */}
-          <div className="max-w-xl space-y-2">
-            <div className="flex items-center justify-between font-mono text-xs font-bold text-slate-700">
-              <span>ZOOM MAGNIFICATION:</span>
-              <span className="text-indigo-600 font-black">{scaleZoom}x</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="500"
-              step="5"
-              value={scaleZoom}
-              onChange={(e) => setScaleZoom(parseInt(e.target.value, 10))}
-              className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-indigo-600"
-            />
-            <div className="flex justify-between text-[11px] font-mono text-slate-400">
-              <span>1x (1 screen)</span>
-              <span>100x (Small street)</span>
-              <span>500x (Entire neighborhood)</span>
-            </div>
+      {/* Feature 3: The True-Scale Interactive Comparator (874,030.5x Gap) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+              Interactive Experiment 03 &bull; Honest Scale Comparator
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+              True Physical Scale: If Sound Was Drawn Side-by-Side with Light
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+              Because Light is 874,030.5&times; faster than Sound, fitting both on one screen is physically impossible without one becoming invisible. Toggle modes to inspect both perspectives:
+            </p>
           </div>
 
-          {/* Visual Bar Comparison */}
-          <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-6">
-            {/* Sound bar */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between font-mono text-xs text-slate-600">
-                <span className="font-bold flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" />
-                  Speed of Sound in 1 ms (34.3 cm):
-                </span>
-                <span className="font-bold text-sky-600">1 pixel wide</span>
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 font-mono text-xs shrink-0">
+            <button
+              onClick={() => {
+                playClick(850);
+                setComparatorMode('macro');
+              }}
+              className={`px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 ${
+                comparatorMode === 'macro'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Macro View (Fit Light)</span>
+            </button>
+            <button
+              onClick={() => {
+                playClick(850);
+                setComparatorMode('micro');
+              }}
+              className={`px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 ${
+                comparatorMode === 'micro'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+              <span>Micro View (Magnify Sound)</span>
+            </button>
+          </div>
+        </div>
+
+        {comparatorMode === 'macro' ? (
+          /* MACRO VIEW: Light fits on your monitor (100% width), Sound is 0.0009px wide */
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-6">
+              {/* Light Bar: 100% width */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between font-mono text-xs">
+                  <span className="font-bold text-slate-900 flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-purple-600 inline-block" />
+                    Light in 1 Second (300,000 km) &bull; Scaled to Fit Your Monitor:
+                  </span>
+                  <span className="font-bold text-purple-700">100% of Screen (Full Width)</span>
+                </div>
+                <div className="h-8 bg-gradient-to-r from-purple-600 via-indigo-600 to-amber-400 rounded-xl flex items-center px-4 justify-between text-white font-mono text-xs font-black shadow-inner">
+                  <span>START (0 km)</span>
+                  <span>7.5 LAPS AROUND PLANET EARTH</span>
+                  <span>FINISH (300,000 km)</span>
+                </div>
               </div>
-              <div className="w-full h-4 bg-slate-200 rounded-lg overflow-hidden flex items-center px-1">
-                <div className="w-1 h-3 bg-sky-600 rounded-xs" title="1 single pixel" />
+
+              {/* Sound Bar: Exactly 1 / 874,030.5 of screen width */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between font-mono text-xs">
+                  <span className="font-bold text-slate-900 flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-sky-500 inline-block" />
+                    Sound in 1 Second (343 meters) &bull; Drawn to Exact Same Scale:
+                  </span>
+                  <span className="font-bold text-rose-600">0.000915 Pixels (Literally Invisible!)</span>
+                </div>
+
+                <div className="relative h-8 bg-slate-200 rounded-xl flex items-center px-4 overflow-hidden border border-slate-300">
+                  {/* Invisible hairline indicator */}
+                  <div className="w-[1px] h-full bg-rose-600 shadow-sm" />
+                  <div className="ml-3 font-mono text-xs font-bold text-slate-600">
+                    &larr; Sound wave front is 1/1,092nd of a single screen pixel wide!
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Light bar */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between font-mono text-xs text-slate-600">
-                <span className="font-bold flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" />
-                  Speed of Light in 1 ms (300 km):
-                </span>
-                <span className="font-bold text-purple-600">874,030 pixels (455 monitors wide!)</span>
+            {/* Electronic Microscope Callout Box */}
+            <div className="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-3 rounded-2xl bg-indigo-600 text-white shrink-0 shadow-md">
+                  <ZoomIn className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-900 text-base">
+                    Why Can’t You See the Sound Bar?
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                    A standard 14-inch laptop monitor has about 1,920 horizontal pixels. If 300,000 km equals 1,920 pixels, then 1 pixel equals <strong>156.25 kilometers</strong>!
+                    Because Sound only travels <strong>343 meters (0.343 km)</strong> in that same second, Sound is less than <strong>1/455th of a single screen pixel</strong>.
+                  </p>
+                </div>
               </div>
-              <div className="relative w-full h-6 bg-purple-100 rounded-lg overflow-hidden border border-purple-200">
-                <div
-                  className="h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-pink-500"
-                  style={{ width: '100%' }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center font-mono text-[11px] font-black text-white drop-shadow-sm">
-                  &larr; Continues past your screen across 454 more laptop displays &rarr;
+
+              <button
+                onClick={() => {
+                  playClick(900);
+                  setComparatorMode('micro');
+                }}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs font-mono shrink-0 shadow-sm transition-all"
+              >
+                Switch to Micro View &rarr;
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* MICRO VIEW: Sound is magnified to visible pixels, Light stretches across 455+ monitors */
+          <div className="space-y-6">
+            {/* Interactive Sound Magnifier Slider */}
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-xs">
+                <span className="font-bold text-slate-700">
+                  MAGNIFY SOUND BAR WIDTH ON YOUR SCREEN:
+                </span>
+                <span className="text-sm font-black text-sky-700">
+                  {soundPx} Pixel{soundPx > 1 ? 's' : ''} Wide
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="1"
+                max="30"
+                step="1"
+                value={soundPx}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setSoundPx(val);
+                  playClick(750 + val * 20);
+                }}
+                className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-ew-resize accent-sky-600"
+              />
+
+              <div className="flex justify-between text-[11px] font-mono text-slate-400">
+                <span>1 px (Hairline)</span>
+                <span>5 px</span>
+                <span>10 px</span>
+                <span>20 px</span>
+                <span>30 px (Thick bar)</span>
+              </div>
+            </div>
+
+            {/* Visual Dynamic Result */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+              <div className="p-5 rounded-2xl bg-sky-50 border border-sky-200 space-y-2">
+                <span className="text-sky-700 uppercase font-bold block text-[10px]">Sound in 1 ms (34.3 cm)</span>
+                <div className="text-2xl font-black text-sky-950 font-mono">
+                  {soundPx} Pixel{soundPx > 1 ? 's' : ''} Wide
+                </div>
+                <div className="w-full h-6 bg-slate-200 rounded-lg flex items-center px-1">
+                  <div
+                    className="h-4 bg-sky-600 rounded-xs transition-all duration-150"
+                    style={{ width: `${soundPx}px` }}
+                  />
+                </div>
+                <p className="text-[11px] text-sky-900 pt-1">
+                  Sound travels 34.3 cm (about 1 foot) in 1 millisecond.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
+                <span className="text-purple-700 uppercase font-bold block text-[10px]">Light in that Same 1 ms (300 km)</span>
+                <div className="text-2xl font-black text-purple-950 font-mono">
+                  {lightBarPixels.toLocaleString()} Pixels Long!
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-purple-900 font-bold">
+                  <Monitor className="w-4 h-4 text-purple-600" />
+                  <span>Requires {monitorsNeeded.toLocaleString()} full laptop monitors lined up side by side!</span>
+                </div>
+                <p className="text-[11px] text-purple-800 pt-1">
+                  That physical row of monitors would stretch <strong>{streetDistanceKm.toFixed(2)} km</strong> ({((streetDistanceKm * 1000) / 100).toFixed(0)} football fields) straight down your street!
+                </p>
+              </div>
+            </div>
+
+            {/* Interactive Flight Odometer across the 300,000 km */}
+            <div className="p-6 rounded-2xl bg-slate-900 text-white space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-xs">
+                <span className="font-bold text-amber-400 uppercase tracking-wider">
+                  Interactive Distance Odometer &bull; Drag to Travel Light’s Path:
+                </span>
+                <span className="text-base font-black text-white">
+                  {panKm >= 1000 ? `${(panKm / 1000).toFixed(1)} thousand km` : `${panKm.toFixed(2)} km`}
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="0.343"
+                max="300000"
+                step="100"
+                value={panKm}
+                onChange={(e) => setPanKm(parseFloat(e.target.value))}
+                className="w-full h-2.5 bg-slate-700 rounded-lg appearance-none cursor-ew-resize accent-amber-400"
+              />
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] font-mono">
+                <div className={`p-2.5 rounded-xl border ${panKm >= 0.343 ? 'border-sky-500 bg-sky-950/40 text-sky-300' : 'border-slate-800 text-slate-500'}`}>
+                  <strong>0.343 km:</strong> Sound finished!
+                </div>
+                <div className={`p-2.5 rounded-xl border ${panKm >= 400 ? 'border-purple-500 bg-purple-950/40 text-purple-300' : 'border-slate-800 text-slate-500'}`}>
+                  <strong>400 km:</strong> Space Station Orbit
+                </div>
+                <div className={`p-2.5 rounded-xl border ${panKm >= 40075 ? 'border-amber-500 bg-amber-950/40 text-amber-300' : 'border-slate-800 text-slate-500'}`}>
+                  <strong>40,075 km:</strong> 1 Full Earth Lap
+                </div>
+                <div className={`p-2.5 rounded-xl border ${panKm >= 300000 ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300' : 'border-slate-800 text-slate-500'}`}>
+                  <strong>300,000 km:</strong> 7.5 Earth Laps!
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

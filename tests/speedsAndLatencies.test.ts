@@ -125,3 +125,32 @@ test('True-Scale Showdown verifies exact 874,000x gap between Light and Sound', 
   assert.ok(Math.abs(earthOrbits - 7.48) < 0.02);
 });
 
+test('Bamboo time-lapse, Sneeze expulsion, and Eye blink transit physics are verified', () => {
+  // Bamboo: 1.0 m in 24 hours (86,400 seconds)
+  const growthRateMps = 1.0 / 86400; // ~1.1574e-5 m/s
+  assert.ok(Math.abs(growthRateMps - 1.1574e-5) < 1e-8);
+  const growthCmPerHour = (growthRateMps * 3600) * 100; // 4.1667 cm/hr
+  assert.ok(Math.abs(growthCmPerHour - 4.1667) < 0.001);
+
+  // Sneeze droplet expulsion: 45 m/s = 162 km/h
+  const sneezeSpeedMps = 45;
+  const sneezeKmh = sneezeSpeedMps * 3.6;
+  assert.strictEqual(sneezeKmh, 162);
+  const roomDistanceM = 6.0;
+  const sneezeRoomTransitSec = roomDistanceM / sneezeSpeedMps; // 0.1333 seconds = 133 ms
+  assert.ok(Math.abs(sneezeRoomTransitSec - 0.1333) < 0.001);
+
+  // Eye blink duration: 100 ms to 150 ms
+  const blinkMinSec = 0.100;
+  const blinkMaxSec = 0.150;
+  const lightTransitMinKm = (299_792_458 * blinkMinSec) / 1000; // ~29,979 km
+  const lightTransitMaxKm = (299_792_458 * blinkMaxSec) / 1000; // ~44,968 km
+  assert.ok(lightTransitMinKm > 29_000 && lightTransitMaxKm < 46_000);
+
+  // Scale Comparator: sound 1 px -> light 874,030.5 px
+  const exactRatio = 299_792_458 / 343;
+  const monitors1px = exactRatio / 1920;
+  assert.ok(Math.abs(monitors1px - 455.22) < 0.1);
+  const monitors10px = (exactRatio * 10) / 1920;
+  assert.ok(Math.abs(monitors10px - 4552.2) < 1.0);
+});
