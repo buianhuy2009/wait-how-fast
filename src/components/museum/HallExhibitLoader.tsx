@@ -7,6 +7,8 @@ import LatencyArcade from '@/components/exhibits/LatencyArcade';
 import DataFlood from '@/components/exhibits/DataFlood';
 import CpuTimeDilation from '@/components/exhibits/CpuTimeDilation';
 import FrameRateVault from '@/components/exhibits/FrameRateVault';
+import HumanSpeedVault from '@/components/exhibits/HumanSpeedVault';
+import CosmicVault from '@/components/exhibits/CosmicVault';
 
 function ExhibitContent({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
@@ -18,6 +20,8 @@ function ExhibitContent({ slug }: { slug: string }) {
   switch (slug) {
     case 'speed':
       return <TrueScaleTrack key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
+    case 'biology':
+      return <HumanSpeedVault key="biology" />;
     case 'latency':
       return <LatencyArcade key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
     case 'data':
@@ -25,7 +29,9 @@ function ExhibitContent({ slug }: { slug: string }) {
     case 'cpu':
       return <CpuTimeDilation key={exhibitParam || 'default'} initialOpId={exhibitParam || 'main-ram'} />;
     case 'framerate':
-      return <FrameRateVault />;
+      return <FrameRateVault key="framerate" />;
+    case 'cosmic':
+      return <CosmicVault key="cosmic" />;
     default:
       return null;
   }

@@ -5,9 +5,10 @@ import { useCalibration } from '@/context/CalibrationContext';
 import { useSound } from '@/context/SoundContext';
 import { SPEED_EXHIBITS, SpeedExhibit } from '@/data/speeds';
 import { velocityToPxPerSec, calculateScreenTransitTime, calculatePpmm } from '@/lib/ppiMath';
+import { FAMILIAR_OBJECTS, FamiliarObject, getFamiliarDistanceComparison } from '@/lib/familiarObjects';
 import PlaqueCard from '@/components/museum/PlaqueCard';
 import ShareFactModal from '@/components/museum/ShareFactModal';
-import { Play, Pause, RotateCcw, ZoomIn, Gauge, Info } from 'lucide-react';
+import { Play, Pause, RotateCcw, ZoomIn, Gauge, Info, Eye } from 'lucide-react';
 
 interface TrueScaleTrackProps {
   initialExhibitId?: string;
@@ -27,6 +28,9 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [zoomScale, setZoomScale] = useState<number>(activeExhibit.defaultZoom);
   const [slowMoScale, setSlowMoScale] = useState<number>(activeExhibit.defaultSlowMo);
+
+  const [selectedFamiliar, setSelectedFamiliar] = useState<FamiliarObject | null>(FAMILIAR_OBJECTS[0]); // Dollar bill
+  const [showFamiliarOverlay, setShowFamiliarOverlay] = useState<boolean>(true);
 
   const [traveledDistanceMm, setTraveledDistanceMm] = useState<number>(0);
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
@@ -135,6 +139,32 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
       ctx.font = 'bold 10px monospace';
       ctx.fillText('FINISH BEZEL', finishX - 70, 30);
 
+      // Draw Familiar Reference Ghost Outline if enabled
+      if (showFamiliarOverlay && selectedFamiliar) {
+        const overlayWidthPx = selectedFamiliar.widthMm * ppmm;
+        const overlayHeightPx = Math.min(height - 40, Math.max(30, selectedFamiliar.heightMm * ppmm));
+        const overlayY = (height - overlayHeightPx) / 2;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.08)';
+        ctx.strokeStyle = 'rgba(129, 140, 248, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(trackPadding, overlayY, overlayWidthPx, overlayHeightPx);
+        ctx.fillRect(trackPadding, overlayY, overlayWidthPx, overlayHeightPx);
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#818cf8';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(
+          `${selectedFamiliar.icon} ${selectedFamiliar.name} (${selectedFamiliar.widthMm}mm)`,
+          trackPadding + 6,
+          overlayY + 14
+        );
+        ctx.restore();
+      }
+
       // Lane 1 Physics
       const pxPerSec1 = velocityToPxPerSec(
         activeExhibit.speedMps,
@@ -239,7 +269,7 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
       cancelAnimationFrame(animId);
       clearInterval(interval);
     };
-  }, [activeExhibit, isDualRace, dualRacer, isPlaying, zoomScale, slowMoScale, ppi, ppmm, playPacket]);
+  }, [activeExhibit, isDualRace, dualRacer, isPlaying, zoomScale, slowMoScale, ppi, ppmm, playPacket, showFamiliarOverlay, selectedFamiliar]);
 
   const transitTime = calculateScreenTransitTime(
     activeExhibit.speedMps,
@@ -333,7 +363,7 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
           </div>
 
           {/* Real-World Distance Meter */}
-          <div className="flex items-center gap-4 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
             <div>
               <span className="text-slate-500 block text-[10px]">REAL SPEED</span>
               <span className="text-cyan-400 font-bold">{activeExhibit.displaySpeed}</span>
@@ -347,11 +377,54 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
                   ? `${(traveledDistanceMm / 10).toFixed(1)} cm`
                   : `${(traveledDistanceMm / 1000).toFixed(2)} m`}
               </span>
+              <span className="text-indigo-400 block text-[10px]">
+                ~{getFamiliarDistanceComparison(traveledDistanceMm)}
+              </span>
             </div>
             <div>
               <span className="text-slate-500 block text-[10px]">TIME TO CROSS MONITOR</span>
               <span className="text-amber-400 font-bold">{transitTime.formatted}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Familiar Everyday Reference Overlay Selector */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 text-xs font-mono">
+          <span className="text-slate-400 flex items-center gap-1.5">
+            <Eye className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Familiar Object Reference on Track:</span>
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {FAMILIAR_OBJECTS.slice(0, 5).map((obj) => (
+              <button
+                key={obj.id}
+                onClick={() => {
+                  playClick(800);
+                  setSelectedFamiliar(obj);
+                  setShowFamiliarOverlay(true);
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all border ${
+                  showFamiliarOverlay && selectedFamiliar?.id === obj.id
+                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                }`}
+              >
+                {obj.icon} {obj.name}
+              </button>
+            ))}
+            <button
+              onClick={() => {
+                playClick(700);
+                setShowFamiliarOverlay(!showFamiliarOverlay);
+              }}
+              className={`px-2 py-1 rounded-lg text-[11px] border transition-colors ${
+                !showFamiliarOverlay
+                  ? 'bg-slate-700 border-slate-600 text-white font-bold'
+                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {showFamiliarOverlay ? 'Hide Ghost' : 'Show Ghost'}
+            </button>
           </div>
         </div>
 

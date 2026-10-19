@@ -27,37 +27,47 @@ export default function Footer() {
         {/* Museum Halls */}
         <div className="space-y-2 text-xs">
           <div className="font-mono text-slate-200 uppercase font-bold text-[11px] mb-2 tracking-wider">
-            Museum Halls
+            Museum Exhibition Wings
           </div>
           <ul className="space-y-1.5 font-mono">
             <li>
               <Link href="/hall/speed" className="hover:text-cyan-400 transition-colors">
-                Hall 1: 1:1 True-Scale Speed
+                Wing 1: Speed Track
+              </Link>
+            </li>
+            <li>
+              <Link href="/hall/biology" className="hover:text-rose-400 transition-colors">
+                Wing 2: The Speed of You
               </Link>
             </li>
             <li>
               <Link href="/hall/latency" className="hover:text-cyan-400 transition-colors">
-                Hall 2: Latency & Ping Arcade
+                Wing 3: Latency & Ping Arcade
               </Link>
             </li>
             <li>
-              <Link href="/hall/data" className="hover:text-cyan-400 transition-colors">
-                Hall 3: The Data Flood (Bits vs Bytes)
+              <Link href="/hall/data" className="hover:text-indigo-400 transition-colors">
+                Wing 4: The Data Flood
               </Link>
             </li>
             <li>
-              <Link href="/hall/cpu" className="hover:text-cyan-400 transition-colors">
-                Hall 4: CPU Time Dilation
+              <Link href="/hall/cpu" className="hover:text-purple-400 transition-colors">
+                Wing 5: Inside Your CPU
               </Link>
             </li>
             <li>
-              <Link href="/hall/framerate" className="hover:text-cyan-400 transition-colors">
-                Hall 5: Frame Rate & Persistence
+              <Link href="/hall/framerate" className="hover:text-amber-400 transition-colors">
+                Wing 6: Refresh & Vision Vault
               </Link>
             </li>
             <li>
-              <Link href="/all" className="text-indigo-400 hover:text-indigo-300 transition-colors">
-                Grand Walkthrough (All Halls)
+              <Link href="/hall/cosmic" className="hover:text-violet-400 transition-colors">
+                Wing 7: The Cosmic Vault
+              </Link>
+            </li>
+            <li>
+              <Link href="/all" className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">
+                Grand Walkthrough (All Wings)
               </Link>
             </li>
           </ul>

@@ -9,26 +9,30 @@ import {
   Compass,
   Volume2,
   VolumeX,
-  CreditCard,
+  Sparkles,
   CheckCircle2,
   Menu,
   X,
   Gauge,
+  Heart,
   Radio,
   HardDrive,
   Cpu,
   Activity,
   Layers,
   HelpCircle,
+  Maximize2,
 } from 'lucide-react';
-import CardCalibrator from '@/components/calibrator/CardCalibrator';
+import FamiliarScaleSelector from '@/components/calibrator/FamiliarScaleSelector';
 
 const NAV_HALLS = [
-  { href: '/hall/speed', label: '1. True-Scale Speed', icon: Gauge, color: 'text-emerald-400' },
-  { href: '/hall/latency', label: '2. Latency Arcade', icon: Radio, color: 'text-cyan-400' },
-  { href: '/hall/data', label: '3. The Data Flood', icon: HardDrive, color: 'text-indigo-400' },
-  { href: '/hall/cpu', label: '4. CPU Time Dilation', icon: Cpu, color: 'text-purple-400' },
-  { href: '/hall/framerate', label: '5. Frame Rate Vault', icon: Activity, color: 'text-amber-400' },
+  { href: '/hall/speed', label: '1. Speed Track', icon: Gauge, color: 'text-emerald-400' },
+  { href: '/hall/biology', label: '2. Speed of You', icon: Heart, color: 'text-rose-400' },
+  { href: '/hall/latency', label: '3. Latency Arcade', icon: Radio, color: 'text-cyan-400' },
+  { href: '/hall/data', label: '4. The Data Flood', icon: HardDrive, color: 'text-indigo-400' },
+  { href: '/hall/cpu', label: '5. Inside Your CPU', icon: Cpu, color: 'text-purple-400' },
+  { href: '/hall/framerate', label: '6. Refresh Vault', icon: Activity, color: 'text-amber-400' },
+  { href: '/hall/cosmic', label: '7. Cosmic Vault', icon: Sparkles, color: 'text-violet-400' },
 ];
 
 export default function Navbar() {
@@ -113,20 +117,12 @@ export default function Navbar() {
                 playClick(900);
                 setIsCalibratorModalOpen(true);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono transition-all border ${
-                isCalibrated
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 animate-pulse'
-              }`}
-              title="Click to recalibrate screen PPI"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono transition-all border bg-slate-900 border-slate-700/80 text-slate-300 hover:border-indigo-500 hover:text-white"
+              title="Display Screen Scale (Click to adjust)"
             >
-              <CreditCard className="w-3.5 h-3.5" />
+              <Maximize2 className="w-3.5 h-3.5 text-indigo-400" />
               <span className="font-bold">{ppi.toFixed(0)} PPI</span>
-              {isCalibrated ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <span className="text-[10px] hidden sm:inline">(Uncalibrated)</span>
-              )}
+              {isCalibrated && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
             </button>
 
             {/* Sound Toggle */}
@@ -165,7 +161,7 @@ export default function Navbar() {
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
           <div className="xl:hidden border-t border-slate-800 bg-slate-950 px-4 pt-3 pb-6 space-y-2">
-            <div className="text-[11px] font-mono text-slate-500 uppercase px-3 py-1">Museum Halls</div>
+            <div className="text-[11px] font-mono text-slate-500 uppercase px-3 py-1">Museum Wings</div>
             {NAV_HALLS.map((hall) => {
               const Icon = hall.icon;
               return (
@@ -186,7 +182,7 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-indigo-300 hover:bg-slate-900"
             >
               <Layers className="w-4 h-4 text-indigo-400" />
-              <span>Full Museum Walkthrough (All Halls)</span>
+              <span>Full Museum Walkthrough (All Wings)</span>
             </Link>
             <Link
               href="/about"
@@ -203,14 +199,14 @@ export default function Navbar() {
       {/* Recalibrate Modal Dialog */}
       {isCalibratorModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl">
+          <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-3xl">
             <button
               onClick={() => setIsCalibratorModalOpen(false)}
-              className="absolute top-8 right-8 z-20 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white"
+              className="absolute top-6 right-6 z-20 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
-            <CardCalibrator onComplete={() => setIsCalibratorModalOpen(false)} />
+            <FamiliarScaleSelector onComplete={() => setIsCalibratorModalOpen(false)} />
           </div>
         </div>
       )}
