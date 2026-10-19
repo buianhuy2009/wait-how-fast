@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useSound } from '@/context/SoundContext';
 import {
   MUSEUM_WALKTHROUGH_SECTIONS,
@@ -15,35 +15,50 @@ export default function MuseumScrollNavigator() {
   const [activeId, setActiveId] = useState<string>('entrance');
   const [progressRatio, setProgressRatio] = useState<number>(0);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetsRef = useRef<number[]>([]);
+  const dragStartYRef = useRef<number | null>(null);
+  const lastSoundIndexRef = useRef<number>(-1);
+
+  // Measure section offsets and cache them to avoid layout thrashing on scroll
+  const measureOffsets = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const scrollY = window.scrollY;
+    offsetsRef.current = MUSEUM_WALKTHROUGH_SECTIONS.map((section) => {
+      const el = document.getElementById(section.id);
+      if (!el) return 0;
+      return el.getBoundingClientRect().top + scrollY;
+    });
+  }, []);
 
   const updateProgress = useCallback(() => {
     if (typeof window === 'undefined') return;
+
+    if (offsetsRef.current.length === 0 || offsetsRef.current.every((o: number) => o === 0)) {
+      measureOffsets();
+    }
 
     const scrollY = window.scrollY;
     const windowHeight = window.innerHeight;
     const docHeight = document.documentElement.scrollHeight;
 
-    const offsets = MUSEUM_WALKTHROUGH_SECTIONS.map((section) => {
-      const el = document.getElementById(section.id);
-      if (!el) return 0;
-      const rect = el.getBoundingClientRect();
-      return rect.top + scrollY;
-    });
-
     const { activeIndex, progressRatio: ratio } = computeScrollProgress(
       scrollY,
       windowHeight,
       docHeight,
-      offsets
+      offsetsRef.current
     );
 
     setActiveId(MUSEUM_WALKTHROUGH_SECTIONS[activeIndex]?.id ?? 'entrance');
     setProgressRatio(ratio);
-  }, []);
+  }, [measureOffsets]);
 
   useEffect(() => {
-    let ticking = false;
+    measureOffsets();
 
+    let ticking = false;
     const onScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -54,34 +69,106 @@ export default function MuseumScrollNavigator() {
       }
     };
 
+    const onResize = () => {
+      measureOffsets();
+      onScroll();
+    };
+
     const rafId = window.requestAnimationFrame(() => {
+      measureOffsets();
       updateProgress();
     });
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && document.body) {
+      resizeObserver = new ResizeObserver(() => {
+        measureOffsets();
+      });
+      resizeObserver.observe(document.body);
+    }
 
     return () => {
       window.cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (resizeObserver) resizeObserver.disconnect();
     };
-  }, [updateProgress]);
+  }, [measureOffsets, updateProgress]);
 
-  const scrollToSection = (id: string, index: number) => {
+  const scrollToSection = useCallback(
+    (id: string, index: number) => {
+      try {
+        playClick(520 + index * 35);
+      } catch {}
+
+      setActiveId(id);
+      const targetRatio = index / Math.max(1, MUSEUM_WALKTHROUGH_SECTIONS.length - 1);
+      setProgressRatio(targetRatio);
+
+      const isReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const behavior: ScrollBehavior = isReducedMotion ? 'auto' : 'smooth';
+
+      if (id === 'entrance') {
+        window.scrollTo({ top: 0, behavior });
+        return;
+      }
+
+      const el = document.getElementById(id);
+      if (el) {
+        const scrollY = window.scrollY;
+        const targetY = Math.max(0, el.getBoundingClientRect().top + scrollY - 80);
+        window.scrollTo({ top: targetY, behavior });
+      }
+    },
+    [playClick]
+  );
+
+  // Pointer scrubbing along the rail
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
     try {
-      playClick(520 + index * 35);
+      e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
+    dragStartYRef.current = e.clientY;
+    setIsDragging(true);
+  };
 
-    if (id === 'entrance') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setActiveId('entrance');
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging || !trackRef.current) return;
+    if (dragStartYRef.current !== null && Math.abs(e.clientY - dragStartYRef.current) < 4) {
       return;
     }
 
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      setActiveId(id);
+    const rect = trackRef.current.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    const docHeight = document.documentElement.scrollHeight;
+    const windowHeight = window.innerHeight;
+    const targetScrollY = ratio * Math.max(1, docHeight - windowHeight);
+
+    window.scrollTo({ top: targetScrollY, behavior: 'instant' });
+
+    const targetIndex = Math.round(ratio * (MUSEUM_WALKTHROUGH_SECTIONS.length - 1));
+    if (targetIndex !== lastSoundIndexRef.current) {
+      lastSoundIndexRef.current = targetIndex;
+      try {
+        playClick(520 + targetIndex * 35);
+      } catch {}
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {}
+      setIsDragging(false);
+      dragStartYRef.current = null;
+      lastSoundIndexRef.current = -1;
     }
   };
 
@@ -95,14 +182,21 @@ export default function MuseumScrollNavigator() {
       className="hidden lg:flex fixed left-3 xl:left-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center select-none"
     >
       <div
-        className={`relative flex flex-col items-center bg-white/75 backdrop-blur-md border border-slate-200/80 rounded-full py-3.5 px-1.5 shadow-2xs transition-all duration-300 ${
-          isHovered
+        className={`relative flex flex-col items-center bg-white/80 backdrop-blur-md border border-slate-200/90 rounded-full py-3 px-1.5 shadow-2xs transition-all duration-300 ${
+          isHovered || isDragging
             ? 'bg-white/95 border-slate-300 shadow-md opacity-100 scale-[1.02]'
             : 'opacity-60 hover:opacity-100'
         }`}
       >
-        {/* Subtle dots container */}
-        <div className="relative flex flex-col items-center gap-2.5">
+        {/* Subtle dots container with interactive rail scrubbing */}
+        <div
+          ref={trackRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className="relative flex flex-col items-center gap-2.5 cursor-pointer touch-none"
+        >
           {/* Vertical Track Rail (runs from center of first dot to center of last dot) */}
           <div className="absolute top-3 bottom-3 left-1/2 -translate-x-1/2 w-[2px] pointer-events-none">
             {/* Inactive line */}
@@ -135,7 +229,7 @@ export default function MuseumScrollNavigator() {
                   aria-hidden="true"
                   className={`block rounded-full transition-all duration-200 ${
                     isActive
-                      ? 'w-3 h-3 bg-indigo-600 ring-4 ring-indigo-100 shadow-xs scale-110'
+                      ? 'w-3 h-3 bg-indigo-600 ring-4 ring-indigo-200/80 shadow-xs scale-110'
                       : isPast
                       ? 'w-2 h-2 bg-indigo-500 group-hover:scale-125'
                       : 'w-2 h-2 bg-slate-300 group-hover:bg-slate-400 group-hover:scale-125'
@@ -144,7 +238,7 @@ export default function MuseumScrollNavigator() {
 
                 {/* Quiet Tooltip on hover/focus */}
                 <div
-                  role="tooltip"
+                  aria-hidden="true"
                   className="absolute left-8 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 -translate-x-1.5 group-hover:translate-x-0 group-focus-visible:translate-x-0 transition-all duration-150 ease-out z-50 whitespace-nowrap"
                 >
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/95 text-white text-xs font-mono font-medium shadow-md border border-slate-800">

@@ -32,18 +32,20 @@ export function computeScrollProgress(
   if (N === 0) return { activeIndex: 0, progressRatio: 0 };
   if (N === 1) return { activeIndex: 0, progressRatio: 1 };
 
-  // Near the top of the document
-  if (scrollY < 80) {
-    return { activeIndex: 0, progressRatio: 0 };
-  }
-
-  // Near the bottom of the document
+  // Bottom of document guard: user scrolled to or near document bottom
   if (windowHeight + scrollY >= docHeight - 40) {
     return { activeIndex: N - 1, progressRatio: 1 };
   }
 
+  // Top of document: entrance breathing room (scrollY <= 80px)
+  const entranceThreshold = 80;
+  if (scrollY <= entranceThreshold) {
+    return { activeIndex: 0, progressRatio: 0 };
+  }
+
   // Viewport trigger line (35% from the top of the screen for natural reading focal point)
-  const triggerY = scrollY + windowHeight * 0.35;
+  const focalOffset = windowHeight * 0.35;
+  const triggerY = scrollY + focalOffset;
 
   if (triggerY <= sectionOffsets[0]) {
     return { activeIndex: 0, progressRatio: 0 };
@@ -53,8 +55,18 @@ export function computeScrollProgress(
     return { activeIndex: N - 1, progressRatio: 1 };
   }
 
+  // Smoothly interpolate between entranceThreshold and the scroll position where triggerY reaches sectionOffsets[1]
+  // This completely eliminates any discontinuous step jump at scrollY = 80px
+  const s1TriggerScrollY = Math.max(entranceThreshold + 1, sectionOffsets[1] - focalOffset);
+  if (scrollY < s1TriggerScrollY) {
+    const fraction = (scrollY - entranceThreshold) / (s1TriggerScrollY - entranceThreshold);
+    const progressRatio = Math.max(0, Math.min(1 / (N - 1), fraction / (N - 1)));
+    const activeIndex = fraction >= 0.5 ? 1 : 0;
+    return { activeIndex, progressRatio };
+  }
+
   // Determine which section segment triggerY currently lies within
-  for (let i = 0; i < N - 1; i++) {
+  for (let i = 1; i < N - 1; i++) {
     const current = sectionOffsets[i];
     const next = sectionOffsets[i + 1];
 
