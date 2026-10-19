@@ -229,6 +229,46 @@ export const PHYSICAL_ANALOGIES: Record<string, PhysicalAnalogyItem> = {
     },
     throughputFact: 'At 1 Gigabit/sec (125 MB/s), your Wi-Fi is pumping 6.25 Liters of water per second (100 gallons a minute)—like an open fire hydrant blasting full bore!',
   },
+  lego: {
+    id: 'lego',
+    name: 'LEGO Bricks (Physical Construction & Mass)',
+    icon: '🧱',
+    unitNoun: '2x4 LEGO brick',
+    baseUnitDescription: '1 Byte = 1 standard 2x4 plastic LEGO brick (approx 2.5 grams, 9.6 mm tall)',
+    scales: {
+      '1b': {
+        quantity: '1 LEGO brick (2.5 g)',
+        comparison: 'A single 2x4 red plastic LEGO brick in your hand.',
+        visualDetail: 'A classic 8-stud toy brick.',
+      },
+      '1kb': {
+        quantity: '1,000 bricks (2.5 kg / 5.5 lbs)',
+        comparison: 'A large flagship LEGO Castle or Millennium Falcon construction set.',
+        visualDetail: 'A large colorful toy box spread across the floor.',
+      },
+      '1mb': {
+        quantity: '1 Million bricks (2.5 Metric Tons)',
+        comparison: 'A life-sized, drivable Bugatti Chiron or Ferrari supercar built entirely out of LEGO bricks!',
+        visualDetail: 'A full-scale working supercar parked on the street.',
+      },
+      '1gb': {
+        quantity: '1 Billion bricks (2,500 Metric Tons)',
+        comparison: 'Enough bricks to build 20 full-sized family houses entirely out of solid plastic bricks!',
+        visualDetail: 'A residential suburban neighborhood of LEGO houses.',
+      },
+      '1tb': {
+        quantity: '1 Trillion bricks (2.5 Million Metric Tons)',
+        comparison: 'An entire metropolis skyline of 100 LEGO skyscrapers taller than the Empire State Building!',
+        visualDetail: 'A towering downtown skyline made of toy bricks.',
+      },
+      '1pb': {
+        quantity: '1 Quadrillion bricks (2.5 Billion Metric Tons)',
+        comparison: 'A solid, 10-meter-high LEGO defensive wall stretching across the entire continental United States border!',
+        visualDetail: 'A continent-spanning plastic wall visible from Earth orbit.',
+      },
+    },
+    throughputFact: 'At 1 Gigabit/sec (125 MB/s), your Wi-Fi router is pouring 125,000 LEGO bricks per second onto your living room floor—filling the room knee-deep in under 2 seconds!',
+  },
 };
 
 /**

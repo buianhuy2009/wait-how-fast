@@ -1,11 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSound } from '@/context/SoundContext';
 import { LATENCY_EXHIBITS, LatencyExhibit } from '@/data/latencies';
 import PlaqueCard from '@/components/museum/PlaqueCard';
 import ShareFactModal from '@/components/museum/ShareFactModal';
-import { Terminal, Gamepad2, Timer, Radio, Rocket } from 'lucide-react';
+import {
+  Terminal,
+  Gamepad2,
+  Timer,
+  Radio,
+  Rocket,
+  Lightbulb,
+  AlertTriangle,
+  RotateCcw,
+  Send,
+  ShieldAlert,
+} from 'lucide-react';
 
 interface LatencyArcadeProps {
   initialExhibitId?: string;
@@ -15,79 +26,225 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
   const { playClick, playSonar, playPacket, playChime, playBuzz } = useSound();
 
   const [activeExhibit, setActiveExhibit] = useState<LatencyExhibit>(() => {
-    return LATENCY_EXHIBITS.find((l) => l.id === initialExhibitId) || LATENCY_EXHIBITS[2]; // Tokyo-London
+    return LATENCY_EXHIBITS.find((l) => l.id === initialExhibitId) || LATENCY_EXHIBITS[2]; // Tokyo-London default
   });
 
-  const [activeTab, setActiveTab] = useState<'typing' | 'reflex' | 'rover' | 'pong' | 'voyager'>('typing');
+  const [activeTab, setActiveTab] = useState<'fiber' | 'typing' | 'pong' | 'rover' | 'mars' | 'reflex' | 'voyager'>(() => {
+    const found = LATENCY_EXHIBITS.find((l) => l.id === initialExhibitId);
+    return found ? found.interactiveType : 'typing';
+  });
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
-
-  // Tab 1: Subsea Cable Typing state
-  const [inputText, setInputText] = useState<string>('');
-  const [displayedText, setDisplayedText] = useState<string>('');
-  const [inFlightPackets, setInFlightPackets] = useState<number>(0);
-  const [customLatencyMs, setCustomLatencyMs] = useState<number>(210);
-
-  // Tab 2: Reflex Reaction state
-  const [reflexState, setReflexState] = useState<'idle' | 'waiting' | 'ready' | 'result'>('idle');
-  const [reflexStartTime, setReflexStartTime] = useState<number>(0);
-  const [userReactionMs, setUserReactionMs] = useState<number | null>(null);
-  const reflexTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Tab 3: Lunar Rover state
-  const roverCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const roverStateRef = useRef({
-    x: 150,
-    y: 100,
-    heading: 0,
-    speed: 0,
-    targetHeading: 0,
-  });
-  const roverCommandQueueRef = useRef<{ timestamp: number; type: 'steer' | 'throttle'; val: number }[]>([]);
-  const [roverTelemetry, setRoverTelemetry] = useState<{ speed: number; x: number; y: number }>({ speed: 0, x: 150, y: 100 });
-
-  // Tab 4: Pong with latency state
-  const pongCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [pongMode, setPongMode] = useState<'starlink' | 'geo'>('starlink');
-  const [pongScore, setPongScore] = useState<{ player: number; cpu: number }>({ player: 0, cpu: 0 });
-  const playerPaddleYRef = useRef<number>(100);
-  const delayedPaddleYRef = useRef<number>(100);
-  const paddleQueueRef = useRef<{ timestamp: number; y: number }[]>([]);
-  const ballRef = useRef({ x: 200, y: 100, vx: 3.5, vy: 2.5 });
-
-  // Tab 5: Voyager 1 Ping state
-  const [voyagerPingSent, setVoyagerPingSent] = useState<boolean>(false);
-  const [voyagerPingProgress, setVoyagerPingProgress] = useState<number>(0);
 
   // Switch exhibit and auto-select relevant mini-game tab
   const selectExhibit = (exhibit: LatencyExhibit) => {
     playClick(900);
     setActiveExhibit(exhibit);
     setActiveTab(exhibit.interactiveType);
-    setCustomLatencyMs(exhibit.roundTripMs);
   };
 
-  // --- SUBSEA TYPING LOGIC ---
+  // =========================================================================
+  // TAB 1: FIBER OPTIC GLASS ("THE GLASS TAX")
+  // =========================================================================
+  const [fiberDistanceKm, setFiberDistanceKm] = useState<number>(5585); // London to NY
+  const [laserPulseProgress, setLaserPulseProgress] = useState<number | null>(null);
+  const fiberCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const speedSpaceKmS = 299792;
+  const speedFiberKmS = 204190; // n = 1.4682
+  const vacuumRttMs = (fiberDistanceKm / speedSpaceKmS) * 2 * 1000;
+  const fiberRttMs = (fiberDistanceKm / speedFiberKmS) * 2 * 1000;
+  const glassTaxMs = fiberRttMs - vacuumRttMs;
+
+  const fireLaserPulse = () => {
+    playSonar(1480, 0.2);
+    setLaserPulseProgress(0);
+    const duration = 2400; // 2.4s animation
+    const start = performance.now();
+
+    const interval = setInterval(() => {
+      const elapsed = performance.now() - start;
+      const progress = Math.min(1.0, elapsed / duration);
+      setLaserPulseProgress(progress);
+
+      if (progress >= 1.0) {
+        clearInterval(interval);
+        playPacket();
+        setTimeout(() => setLaserPulseProgress(null), 1200);
+      }
+    }, 16);
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'fiber') return;
+    const canvas = fiberCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+
+    const handleResize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    const render = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
+
+      ctx.fillStyle = '#0a0d18';
+      ctx.fillRect(0, 0, width, height);
+
+      const trackPad = 40;
+      const trackWidth = width - trackPad * 2;
+      const yVacuum = height * 0.35;
+      const yFiber = height * 0.7;
+
+      // Vacuum Lane
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(trackPad, yVacuum);
+      ctx.lineTo(width - trackPad, yVacuum);
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(`EMPTY SPACE / VACUUM (c = 300,000 km/s)`, trackPad, yVacuum - 14);
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(`${vacuumRttMs.toFixed(2)} ms RTT`, width - trackPad - 80, yVacuum - 14);
+
+      // Fiber Silica Glass Lane
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(trackPad, yFiber);
+      ctx.lineTo(width - trackPad, yFiber);
+      ctx.stroke();
+
+      // Glass Cladding Glow
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+      ctx.lineWidth = 18;
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(`SOLID SILICA GLASS (v = 204,190 km/s — Refractive Index n = 1.468)`, trackPad, yFiber - 18);
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText(`${fiberRttMs.toFixed(2)} ms RTT (+${glassTaxMs.toFixed(2)}ms Glass Tax)`, width - trackPad - 200, yFiber - 18);
+
+      // Draw Laser Pulses if active
+      if (laserPulseProgress !== null) {
+        // In vacuum: travels at 1.0 relative speed (arrives first at t = 0.68)
+        const vacP = Math.min(1.0, laserPulseProgress * (1 / 0.681));
+        const vacX = trackPad + vacP * trackWidth;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(vacX, yVacuum, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath();
+        ctx.arc(vacX, yVacuum, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // In glass: travels at 0.681 relative speed (arrives at t = 1.0)
+        const fibP = laserPulseProgress;
+        const fibX = trackPad + fibP * trackWidth;
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(fibX, yFiber, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.beginPath();
+        ctx.arc(fibX, yFiber, 14, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animId);
+    };
+  }, [activeTab, laserPulseProgress, fiberDistanceKm, vacuumRttMs, fiberRttMs, glassTaxMs]);
+
+  // =========================================================================
+  // TAB 2: SUBSEA OCEAN TYPIST (ROBUST FIFO QUEUE WITH DELAYED ECHO)
+  // =========================================================================
+  const [inputText, setInputText] = useState<string>('');
+  const [displayedText, setDisplayedText] = useState<string>('');
+  const [customLatencyMs, setCustomLatencyMs] = useState<number>(210);
+  const [inFlightPackets, setInFlightPackets] = useState<number>(0);
+  const typingQueueRef = useRef<{ value: string; timestamp: number }[]>([]);
+
   const handleTypingChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     setInputText(newVal);
+    playClick(750);
 
-    if (newVal.length > inputText.length) {
-      // New char typed
-      playClick(750);
-      setInFlightPackets((prev) => prev + 1);
-
-      const delay = customLatencyMs;
-      setTimeout(() => {
-        setDisplayedText(newVal);
-        setInFlightPackets((prev) => Math.max(0, prev - 1));
-        playPacket();
-      }, delay);
-    } else {
-      setDisplayedText(newVal);
-    }
+    typingQueueRef.current.push({
+      value: newVal,
+      timestamp: performance.now(),
+    });
+    setInFlightPackets(typingQueueRef.current.length);
   };
 
-  // --- REFLEX TEST LOGIC ---
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = performance.now();
+      let updatedVal: string | null = null;
+
+      while (
+        typingQueueRef.current.length > 0 &&
+        now - typingQueueRef.current[0].timestamp >= customLatencyMs
+      ) {
+        const item = typingQueueRef.current.shift();
+        if (item) {
+          updatedVal = item.value;
+        }
+      }
+
+      if (updatedVal !== null) {
+        setDisplayedText(updatedVal);
+        playPacket();
+      }
+      setInFlightPackets(typingQueueRef.current.length);
+    }, 20);
+
+    return () => clearInterval(interval);
+  }, [customLatencyMs, playPacket]);
+
+  const handleClearTerminal = () => {
+    setInputText('');
+    setDisplayedText('');
+    typingQueueRef.current = [];
+    setInFlightPackets(0);
+    playClick(600);
+  };
+
+  // =========================================================================
+  // TAB 3: NERVE REFLEX BENCH
+  // =========================================================================
+  const [reflexState, setReflexState] = useState<'idle' | 'waiting' | 'ready' | 'result'>('idle');
+  const [reflexStartTime, setReflexStartTime] = useState<number>(0);
+  const [userReactionMs, setUserReactionMs] = useState<number | null>(null);
+  const reflexTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const startReflexTest = () => {
     playClick(800);
     setReflexState('waiting');
@@ -115,7 +272,63 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     }
   };
 
-  // --- LUNAR ROVER GAME LOOP ---
+  // =========================================================================
+  // TAB 4: LUNAR ROVER (2.56S DELAY + ARROW KEYS & WASD SUPPORT)
+  // =========================================================================
+  const roverCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const roverStateRef = useRef({
+    x: 180,
+    y: 120,
+    heading: 0,
+    speed: 0,
+  });
+  const roverCommandQueueRef = useRef<{ timestamp: number; type: 'steer' | 'throttle'; val: number }[]>([]);
+  const [roverTelemetry, setRoverTelemetry] = useState<{ speed: number; x: number; y: number; pendingCommands: number }>({
+    speed: 0,
+    x: 180,
+    y: 120,
+    pendingCommands: 0,
+  });
+
+  const sendRoverCommand = useCallback(
+    (type: 'steer' | 'throttle', val: number) => {
+      playSonar(900, 0.08);
+      roverCommandQueueRef.current.push({
+        timestamp: performance.now(),
+        type,
+        val,
+      });
+      setRoverTelemetry((prev) => ({
+        ...prev,
+        pendingCommands: roverCommandQueueRef.current.length,
+      }));
+    },
+    [playSonar]
+  );
+
+  // Keyboard navigation for Lunar Rover
+  useEffect(() => {
+    if (activeTab !== 'rover') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
+        e.preventDefault();
+      }
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        sendRoverCommand('throttle', 0.4);
+      } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        sendRoverCommand('throttle', -0.4);
+      } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        sendRoverCommand('steer', -0.25);
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        sendRoverCommand('steer', 0.25);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, sendRoverCommand]);
+
   useEffect(() => {
     if (activeTab !== 'rover') return;
 
@@ -126,14 +339,29 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     if (!ctx) return;
 
     const obstacles = [
-      { x: 120, y: 70, r: 25, label: 'Crater Tycho-A' },
-      { x: 280, y: 140, r: 35, label: 'Regolith Boulder' },
-      { x: 440, y: 60, r: 20, label: 'Crater Artemis' },
+      { x: 140, y: 70, r: 28, label: 'Crater Tycho-A' },
+      { x: 320, y: 150, r: 35, label: 'Regolith Boulder' },
+      { x: 500, y: 70, r: 24, label: 'Crater Artemis' },
     ];
 
+    const handleResize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     const loop = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
+
       const now = performance.now();
-      const delayMs = 1282; // 1.28s uplink delay
+      const delayMs = 1282; // 1.28s uplink light delay
 
       // Process delayed commands
       while (
@@ -145,7 +373,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
           if (cmd.type === 'steer') {
             roverStateRef.current.heading += cmd.val;
           } else if (cmd.type === 'throttle') {
-            roverStateRef.current.speed = Math.max(-1, Math.min(2.5, roverStateRef.current.speed + cmd.val));
+            roverStateRef.current.speed = Math.max(-1.2, Math.min(2.8, roverStateRef.current.speed + cmd.val));
           }
         }
       }
@@ -156,20 +384,20 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
       r.y += Math.sin(r.heading) * r.speed;
 
       // Wrap boundaries
-      if (r.x < 20) r.x = canvas.width - 20;
-      if (r.x > canvas.width - 20) r.x = 20;
-      if (r.y < 20) r.y = canvas.height - 20;
-      if (r.y > canvas.height - 20) r.y = 20;
+      if (r.x < 20) r.x = width - 20;
+      if (r.x > width - 20) r.x = 20;
+      if (r.y < 20) r.y = height - 20;
+      if (r.y > height - 20) r.y = 20;
 
-      // Draw lunar landscape
+      // Draw landscape
       ctx.fillStyle = '#11131a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, width, height);
 
       // Stars
       ctx.fillStyle = '#475569';
       for (let i = 0; i < 40; i++) {
-        const sx = ((i * 37) % canvas.width);
-        const sy = ((i * 53) % canvas.height);
+        const sx = (i * 47) % width;
+        const sy = (i * 61) % height;
         ctx.fillRect(sx, sy, 1.5, 1.5);
       }
 
@@ -227,25 +455,71 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
         speed: roverStateRef.current.speed,
         x: Math.round(roverStateRef.current.x),
         y: Math.round(roverStateRef.current.y),
+        pendingCommands: roverCommandQueueRef.current.length,
       });
-    }, 200);
+    }, 150);
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
       clearInterval(telemetryInterval);
     };
   }, [activeTab]);
 
-  const sendRoverCommand = (type: 'steer' | 'throttle', val: number) => {
-    playSonar(900, 0.08);
-    roverCommandQueueRef.current.push({
-      timestamp: performance.now(),
-      type,
-      val,
-    });
+  // =========================================================================
+  // TAB 5: MARS PERSEVERANCE ROVER (CLIFF HAZARD & INTERPLANETARY LAG)
+  // =========================================================================
+  const [marsDistanceMode, setMarsDistanceMode] = useState<'closest' | 'average' | 'furthest'>('average');
+  const [marsSimState, setMarsSimState] = useState<'approaching' | 'command_sent' | 'cliff_fallen' | 'autonav_saved'>('approaching');
+  const [marsElapsedSec, setMarsElapsedSec] = useState<number>(0);
+
+  const marsConfig = {
+    closest: { km: 54_600_000, oneWayMin: 3.03, rttMin: 6.07, label: 'Closest Approach (54.6M km)' },
+    average: { km: 189_000_000, oneWayMin: 10.5, rttMin: 21.0, label: 'Average Distance (189M km)' },
+    furthest: { km: 401_000_000, oneWayMin: 22.3, rttMin: 44.6, label: 'Maximum Apogee (401M km)' },
+  }[marsDistanceMode];
+
+  const handleSendMarsStop = () => {
+    playBuzz();
+    setMarsSimState('command_sent');
+    setMarsElapsedSec(0);
+
+    // Accelerate countdown to demonstrate the tragic delay
+    const start = performance.now();
+    const interval = setInterval(() => {
+      const elapsed = Math.round((performance.now() - start) / 100);
+      setMarsElapsedSec(elapsed);
+
+      if (elapsed >= 35) {
+        clearInterval(interval);
+        setMarsSimState('cliff_fallen');
+        playBuzz();
+      }
+    }, 100);
   };
 
-  // --- PONG GAME LOOP (STARLINK VS GEO) ---
+  const handleEnableAutoNav = () => {
+    playChime();
+    setMarsSimState('autonav_saved');
+  };
+
+  const handleResetMars = () => {
+    playClick(600);
+    setMarsSimState('approaching');
+    setMarsElapsedSec(0);
+  };
+
+  // =========================================================================
+  // TAB 6: STARLINK VS GEO SATELLITE PONG
+  // =========================================================================
+  const pongCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [pongMode, setPongMode] = useState<'starlink' | 'geo'>('starlink');
+  const [pongScore, setPongScore] = useState<{ player: number; cpu: number }>({ player: 0, cpu: 0 });
+  const playerPaddleYRef = useRef<number>(100);
+  const delayedPaddleYRef = useRef<number>(100);
+  const paddleQueueRef = useRef<{ timestamp: number; y: number }[]>([]);
+  const ballRef = useRef({ x: 200, y: 100, vx: 3.5, vy: 2.5 });
+
   useEffect(() => {
     if (activeTab !== 'pong') return;
 
@@ -257,7 +531,22 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
 
     const lagMs = pongMode === 'starlink' ? 32 : 600;
 
+    const handleResize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     const loop = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
+
       const now = performance.now();
 
       // Retrieve delayed paddle position
@@ -277,7 +566,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
       b.y += b.vy;
 
       // Top/bottom bounce
-      if (b.y < 10 || b.y > canvas.height - 10) {
+      if (b.y < 10 || b.y > height - 10) {
         b.vy = -b.vy;
       }
 
@@ -292,7 +581,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
 
       // Right paddle collision (CPU)
       const cpuPaddleY = b.y - paddleH / 2;
-      if (b.x >= canvas.width - 35 && b.x <= canvas.width - 20) {
+      if (b.x >= width - 35 && b.x <= width - 20) {
         b.vx = -Math.abs(b.vx);
         playSonar(1100, 0.06);
       }
@@ -300,42 +589,42 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
       // Score checking
       if (b.x < 0) {
         setPongScore((s) => ({ ...s, cpu: s.cpu + 1 }));
-        b.x = canvas.width / 2;
-        b.y = canvas.height / 2;
+        b.x = width / 2;
+        b.y = height / 2;
         b.vx = 3.5;
         playBuzz();
-      } else if (b.x > canvas.width) {
+      } else if (b.x > width) {
         setPongScore((s) => ({ ...s, player: s.player + 1 }));
-        b.x = canvas.width / 2;
-        b.y = canvas.height / 2;
+        b.x = width / 2;
+        b.y = height / 2;
         b.vx = -3.5;
         playChime();
       }
 
       // Render Pong
       ctx.fillStyle = '#0a0d18';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, width, height);
 
       // Center dotted line
       ctx.strokeStyle = '#1e293b';
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
-      ctx.moveTo(canvas.width / 2, 0);
-      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.moveTo(width / 2, 0);
+      ctx.lineTo(width / 2, height);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Draw Real-Time Player Ghost (Where your mouse actually is)
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.2)';
+      // Draw Real-Time Player Ghost (Where your mouse actually is right now)
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
       ctx.fillRect(20, playerPaddleYRef.current, 10, paddleH);
 
-      // Draw Delayed Paddle (What server sees after latency)
+      // Draw Delayed Paddle (What server sees after satellite round-trip)
       ctx.fillStyle = '#38bdf8';
       ctx.fillRect(20, delayedPaddleYRef.current, 10, paddleH);
 
       // Draw CPU Paddle
       ctx.fillStyle = '#f43f5e';
-      ctx.fillRect(canvas.width - 30, Math.max(0, Math.min(canvas.height - paddleH, cpuPaddleY)), 10, paddleH);
+      ctx.fillRect(width - 30, Math.max(0, Math.min(height - paddleH, cpuPaddleY)), 10, paddleH);
 
       // Draw Ball
       ctx.fillStyle = '#facc15';
@@ -347,7 +636,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     };
 
     animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animId);
+    };
   }, [activeTab, pongMode, playSonar, playBuzz, playChime]);
 
   const handlePongMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -355,7 +647,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const mouseY = e.clientY - rect.top - 25;
-    const clampedY = Math.max(0, Math.min(canvas.height - 50, mouseY));
+    const clampedY = Math.max(0, Math.min(rect.height - 50, mouseY));
 
     playerPaddleYRef.current = clampedY;
     paddleQueueRef.current.push({
@@ -364,7 +656,12 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
     });
   };
 
-  // --- VOYAGER 1 PING SIMULATION ---
+  // =========================================================================
+  // TAB 7: VOYAGER 1 PING
+  // =========================================================================
+  const [voyagerPingSent, setVoyagerPingSent] = useState<boolean>(false);
+  const [voyagerPingProgress, setVoyagerPingProgress] = useState<number>(0);
+
   const sendVoyagerPing = () => {
     playSonar(1600, 0.4);
     setVoyagerPingSent(true);
@@ -383,6 +680,12 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
         playPacket();
       }
     }, 50);
+  };
+
+  const resetVoyagerPing = () => {
+    playClick(600);
+    setVoyagerPingSent(false);
+    setVoyagerPingProgress(0);
   };
 
   return (
@@ -404,11 +707,21 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                     ? 'bg-slate-800 border-indigo-500 shadow-lg text-white'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
                 }`}
+                style={{
+                  borderLeftColor: isSelected ? '#6366f1' : undefined,
+                  borderLeftWidth: isSelected ? '4px' : undefined,
+                }}
               >
                 <div className="text-xl mb-1">{item.icon}</div>
                 <div className="text-xs font-bold truncate text-slate-200">{item.name}</div>
-                <div className="text-[10px] font-mono text-cyan-400 mt-0.5">
-                  {item.roundTripMs < 1000 ? `${item.roundTripMs} ms` : `${(item.roundTripMs / 1000).toFixed(1)}s`}
+                <div className="text-[10px] font-mono text-cyan-400 mt-0.5 truncate">
+                  {item.roundTripMs < 1000
+                    ? `${item.roundTripMs} ms`
+                    : item.roundTripMs < 60_000
+                    ? `${(item.roundTripMs / 1000).toFixed(1)}s`
+                    : item.roundTripMs < 3_600_000
+                    ? `${(item.roundTripMs / 60_000).toFixed(0)} min`
+                    : `${(item.roundTripMs / 3_600_000).toFixed(1)} hrs`}
                 </div>
               </button>
             );
@@ -424,16 +737,31 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
             <button
               onClick={() => {
                 playClick(800);
+                setActiveTab('fiber');
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+                activeTab === 'fiber'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold'
+                  : 'bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <Lightbulb className="w-3.5 h-3.5" />
+              Fiber Glass Tax
+            </button>
+
+            <button
+              onClick={() => {
+                playClick(800);
                 setActiveTab('typing');
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                 activeTab === 'typing'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
-              Subsea Ocean Typist ({customLatencyMs}ms)
+              Ocean Typist ({customLatencyMs}ms)
             </button>
 
             <button
@@ -443,7 +771,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                 activeTab === 'reflex'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
@@ -454,31 +782,46 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
             <button
               onClick={() => {
                 playClick(800);
-                setActiveTab('rover');
+                setActiveTab('pong');
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
-                activeTab === 'rover'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                activeTab === 'pong'
+                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
-              <Gamepad2 className="w-3.5 h-3.5" />
-              Lunar Rover (2.56s Delay)
+              <Radio className="w-3.5 h-3.5" />
+              Satellite Pong
             </button>
 
             <button
               onClick={() => {
                 playClick(800);
-                setActiveTab('pong');
+                setActiveTab('rover');
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
-                activeTab === 'pong'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                activeTab === 'rover'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
-              <Radio className="w-3.5 h-3.5" />
-              Starlink vs GEO Pong
+              <Gamepad2 className="w-3.5 h-3.5" />
+              Lunar Rover (2.56s Lag)
+            </button>
+
+            <button
+              onClick={() => {
+                playClick(800);
+                setActiveTab('mars');
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
+                activeTab === 'mars'
+                  ? 'bg-red-500/20 text-red-300 border border-red-500/40 font-bold'
+                  : 'bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Mars Cliff Hazard ({marsConfig.oneWayMin} min Lag)
             </button>
 
             <button
@@ -488,12 +831,12 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                 activeTab === 'voyager'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
               <Rocket className="w-3.5 h-3.5" />
-              Voyager 1 Deep Space Ping
+              Voyager 1 Ping
             </button>
           </div>
 
@@ -502,42 +845,136 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
             <strong className="px-2 py-0.5 rounded bg-slate-800 border border-cyan-500/30 text-white">
               {activeExhibit.roundTripMs < 1000
                 ? `${activeExhibit.roundTripMs} ms`
-                : `${(activeExhibit.roundTripMs / 1000).toFixed(2)} seconds`}
+                : activeExhibit.roundTripMs < 60_000
+                ? `${(activeExhibit.roundTripMs / 1000).toFixed(2)}s`
+                : `${(activeExhibit.roundTripMs / 60_000).toFixed(1)} minutes`}
             </strong>
           </div>
         </div>
 
-        {/* --- TAB 1: SUBSEA OCEAN TYPIST --- */}
+        {/* --- TAB 1: FIBER OPTIC GLASS TAX --- */}
+        {activeTab === 'fiber' && (
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                💡 <strong>The Glass Tax:</strong> Silica glass has a refractive index of n ≈ 1.468, which slows light from 300,000 km/s down to 204,190 km/s (31.8% slower than space)!
+              </div>
+              <button
+                onClick={fireLaserPulse}
+                disabled={laserPulseProgress !== null}
+                className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold transition-all shadow-md"
+              >
+                {laserPulseProgress !== null ? 'PULSING LASER...' : '⚡ FIRE LASER PULSE RACE'}
+              </button>
+            </div>
+
+            {/* Distance Slider & Presets */}
+            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+              <div className="flex flex-wrap items-center justify-between text-xs font-mono">
+                <span className="text-slate-400">CABLE TRANSMISSION DISTANCE:</span>
+                <span className="text-cyan-400 font-bold">{fiberDistanceKm.toLocaleString()} km</span>
+              </div>
+              <input
+                type="range"
+                min="500"
+                max="20000"
+                step="250"
+                value={fiberDistanceKm}
+                onChange={(e) => setFiberDistanceKm(parseInt(e.target.value, 10))}
+                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-ew-resize accent-cyan-400"
+              />
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[10px] font-mono text-slate-500">Quick Routes:</span>
+                <button
+                  onClick={() => setFiberDistanceKm(5585)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-mono ${
+                    fiberDistanceKm === 5585 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  London &rarr; New York (5,585 km)
+                </button>
+                <button
+                  onClick={() => setFiberDistanceKm(8280)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-mono ${
+                    fiberDistanceKm === 8280 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  SF &rarr; Tokyo (8,280 km)
+                </button>
+                <button
+                  onClick={() => setFiberDistanceKm(13200)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-mono ${
+                    fiberDistanceKm === 13200 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Tokyo &rarr; London Subsea (13,200 km)
+                </button>
+              </div>
+            </div>
+
+            {/* Canvas Race View */}
+            <div className="relative w-full h-56 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+              <canvas ref={fiberCanvasRef} className="w-full h-full block" />
+            </div>
+
+            {/* Calculation Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block">VACUUM SPEED OF LIGHT</span>
+                <strong className="text-white text-sm">{vacuumRttMs.toFixed(2)} ms RTT</strong>
+                <span className="text-[10px] text-slate-400 block mt-0.5">300,000 km/s in space</span>
+              </div>
+              <div className="p-3 rounded-lg bg-slate-950 border border-sky-500/30">
+                <span className="text-[10px] text-sky-400 block font-semibold">SILICA FIBER CABLE</span>
+                <strong className="text-sky-300 text-sm">{fiberRttMs.toFixed(2)} ms RTT</strong>
+                <span className="text-[10px] text-slate-400 block mt-0.5">204,190 km/s in glass</span>
+              </div>
+              <div className="p-3 rounded-lg bg-slate-950 border border-amber-500/30">
+                <span className="text-[10px] text-amber-400 block font-semibold">&quot;THE GLASS TAX&quot; ADDED</span>
+                <strong className="text-amber-300 text-sm">+{glassTaxMs.toFixed(2)} ms</strong>
+                <span className="text-[10px] text-slate-400 block mt-0.5">Delay added purely by glass!</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- TAB 2: SUBSEA OCEAN TYPIST --- */}
         {activeTab === 'typing' && (
           <div className="space-y-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-3">
               <span>
-                💡 <strong>How it works:</strong> Type in the left box. Every keystroke is queued and delayed by{' '}
+                💡 <strong>How it works:</strong> Type in the left box. Every keystroke and backspace is buffered and delayed by{' '}
                 <strong className="text-cyan-400">{customLatencyMs} ms</strong> before echoing onto the remote terminal!
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono text-slate-500">Preset:</span>
                 <button
                   onClick={() => setCustomLatencyMs(10)}
-                  className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-mono"
+                  className={`px-2 py-1 rounded font-mono text-xs ${customLatencyMs === 10 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-400'}`}
                 >
                   Local (10ms)
                 </button>
                 <button
+                  onClick={() => setCustomLatencyMs(70)}
+                  className={`px-2 py-1 rounded font-mono text-xs ${customLatencyMs === 70 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-400'}`}
+                >
+                  Atlantic (70ms)
+                </button>
+                <button
                   onClick={() => setCustomLatencyMs(210)}
-                  className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-cyan-300 font-mono"
+                  className={`px-2 py-1 rounded font-mono text-xs ${customLatencyMs === 210 ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-cyan-300'}`}
                 >
                   Tokyo (210ms)
                 </button>
                 <button
                   onClick={() => setCustomLatencyMs(600)}
-                  className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-amber-300 font-mono"
+                  className={`px-2 py-1 rounded font-mono text-xs ${customLatencyMs === 600 ? 'bg-amber-600 text-white font-bold' : 'bg-slate-800 text-amber-300'}`}
                 >
-                  Satellite (600ms)
+                  GEO (600ms)
                 </button>
                 <button
                   onClick={() => setCustomLatencyMs(2564)}
-                  className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-red-300 font-mono"
+                  className={`px-2 py-1 rounded font-mono text-xs ${customLatencyMs === 2564 ? 'bg-red-600 text-white font-bold' : 'bg-slate-800 text-red-300'}`}
                 >
                   Moon (2.5s)
                 </button>
@@ -557,14 +994,14 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 <textarea
                   value={inputText}
                   onChange={handleTypingChange}
-                  placeholder="Type a sentence here (e.g. 'Hello from London! The subsea cables are deep...')"
+                  placeholder="Type a sentence here (e.g. 'Hello from London! Subsea fiber cables are deep...')"
                   className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white font-mono focus:outline-none focus:border-indigo-500 resize-none"
                 />
                 <div className="flex items-center justify-between mt-2 text-[11px] font-mono text-slate-500">
                   <span>Characters typed: {inputText.length}</span>
                   {inFlightPackets > 0 && (
                     <span className="text-cyan-400 animate-pulse">
-                      ⚡ {inFlightPackets} packets in-flight under Atlantic ocean...
+                      ⚡ {inFlightPackets} packets in-flight under the ocean...
                     </span>
                   )}
                 </div>
@@ -585,13 +1022,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 </div>
                 <div className="flex items-center justify-between mt-2 text-[11px] font-mono text-slate-500">
                   <span>Echoed characters: {displayedText.length}</span>
-                  <button
-                    onClick={() => {
-                      setInputText('');
-                      setDisplayedText('');
-                    }}
-                    className="text-slate-400 hover:text-white"
-                  >
+                  <button onClick={handleClearTerminal} className="text-slate-400 hover:text-white">
                     Clear Terminal
                   </button>
                 </div>
@@ -600,7 +1031,7 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
           </div>
         )}
 
-        {/* --- TAB 2: REFLEX BENCH --- */}
+        {/* --- TAB 3: REFLEX BENCH --- */}
         {activeTab === 'reflex' && (
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
@@ -666,58 +1097,10 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
           </div>
         )}
 
-        {/* --- TAB 3: LUNAR ROVER --- */}
-        {activeTab === 'rover' && (
-          <div className="space-y-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-              <span>
-                🌕 <strong>Earth-to-Moon Teleoperation:</strong> Steer the rover around lunar craters. Every command takes{' '}
-                <strong className="text-amber-400">1.28 seconds</strong> to reach the Moon!
-              </span>
-              <div className="text-xs font-mono text-slate-400">
-                Speed: <strong className="text-white">{roverTelemetry.speed.toFixed(1)} m/s</strong> | Pos:{' '}
-                {roverTelemetry.x},{roverTelemetry.y}
-              </div>
-            </div>
-
-            <div className="relative w-full h-64 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
-              <canvas ref={roverCanvasRef} width={600} height={256} className="w-full h-full block" />
-            </div>
-
-            {/* Rover Controls */}
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => sendRoverCommand('steer', -0.3)}
-                className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm"
-              >
-                ◀ Turn Left (1.28s Lag)
-              </button>
-              <button
-                onClick={() => sendRoverCommand('throttle', 0.5)}
-                className="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg"
-              >
-                ▲ Accelerate (Forward)
-              </button>
-              <button
-                onClick={() => sendRoverCommand('throttle', -0.5)}
-                className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm"
-              >
-                ▼ Reverse / Brake
-              </button>
-              <button
-                onClick={() => sendRoverCommand('steer', 0.3)}
-                className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm"
-              >
-                Turn Right (1.28s Lag) ▶
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* --- TAB 4: STARLINK VS GEO PONG --- */}
+        {/* --- TAB 4: STARLINK VS GEO SATELLITE PONG --- */}
         {activeTab === 'pong' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+            <div className="flex flex-wrap items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-slate-400">Satellite Orbit:</span>
                 <button
@@ -748,17 +1131,26 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                 </button>
               </div>
 
-              <div className="font-mono text-xs text-white">
-                Score: <span className="text-cyan-400 font-bold">{pongScore.player}</span> -{' '}
-                <span className="text-red-400 font-bold">{pongScore.cpu}</span>
+              <div className="flex items-center gap-3">
+                <div className="font-mono text-xs text-white">
+                  Score: <span className="text-cyan-400 font-bold">{pongScore.player}</span> -{' '}
+                  <span className="text-red-400 font-bold">{pongScore.cpu}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    playClick(600);
+                    setPongScore({ player: 0, cpu: 0 });
+                  }}
+                  className="text-slate-400 hover:text-white text-xs font-mono"
+                >
+                  Reset Score
+                </button>
               </div>
             </div>
 
             <div className="relative w-full h-64 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 cursor-crosshair">
               <canvas
                 ref={pongCanvasRef}
-                width={600}
-                height={256}
                 onMouseMove={handlePongMouseMove}
                 className="w-full h-full block"
               />
@@ -769,7 +1161,204 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
           </div>
         )}
 
-        {/* --- TAB 5: VOYAGER 1 PING --- */}
+        {/* --- TAB 5: LUNAR ROVER --- */}
+        {activeTab === 'rover' && (
+          <div className="space-y-4">
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-3">
+              <span>
+                🌕 <strong>Earth-to-Moon Teleoperation:</strong> Steer the rover around lunar craters using Arrow Keys or buttons. Every command takes{' '}
+                <strong className="text-amber-400">1.28 seconds</strong> to reach the Moon, and telemetry takes{' '}
+                <strong className="text-amber-400">1.28 seconds</strong> to return!
+              </span>
+              <div className="text-xs font-mono text-slate-400">
+                Speed: <strong className="text-white">{roverTelemetry.speed.toFixed(1)} m/s</strong> | In-flight cmds:{' '}
+                <strong className="text-cyan-400">{roverTelemetry.pendingCommands}</strong>
+              </div>
+            </div>
+
+            <div className="relative w-full h-64 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+              <canvas ref={roverCanvasRef} className="w-full h-full block" />
+            </div>
+
+            {/* Rover Controls */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => sendRoverCommand('steer', -0.3)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs"
+              >
+                ◀ Turn Left (&larr; / A)
+              </button>
+              <button
+                onClick={() => sendRoverCommand('throttle', 0.5)}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg"
+              >
+                ▲ Accelerate (&uarr; / W)
+              </button>
+              <button
+                onClick={() => sendRoverCommand('throttle', -0.5)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs"
+              >
+                ▼ Reverse / Brake (&darr; / S)
+              </button>
+              <button
+                onClick={() => sendRoverCommand('steer', 0.3)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs"
+              >
+                Turn Right (&rarr; / D) ▶
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-500 text-center font-mono">
+              💡 Tip: Press your keyboard Arrow Keys or W/A/S/D to drive. Notice how awkward it feels to navigate around craters with 1.28s of radio lag!
+            </p>
+          </div>
+        )}
+
+        {/* --- TAB 6: MARS PERSEVERANCE ROVER CLIFF HAZARD --- */}
+        {activeTab === 'mars' && (
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                🔴 <strong>The Interplanetary Dilemma:</strong> Why NASA engineers CANNOT steer Mars rovers with a joystick. Signals take minutes to cross space!
+              </div>
+              <div className="flex items-center gap-2">
+                {(['closest', 'average', 'furthest'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => {
+                      playClick(850);
+                      setMarsDistanceMode(mode);
+                      handleResetMars();
+                    }}
+                    className={`px-2.5 py-1 rounded text-xs font-mono ${
+                      marsDistanceMode === mode
+                        ? 'bg-red-600 text-white font-bold'
+                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {mode.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mars Simulation Arena */}
+            <div className="p-6 rounded-2xl bg-gradient-to-b from-red-950/30 via-slate-950 to-slate-950 border border-red-500/30 min-h-[260px] flex flex-col justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-red-500/20 pb-4 mb-4">
+                <div>
+                  <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest block">
+                    MISSION CONTROL TELEMETRY
+                  </span>
+                  <div className="text-lg font-bold text-white tracking-tight">
+                    Perseverance Approaching Jezero Crater Rim
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 text-xs font-mono">
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">DISTANCE TO MARS</span>
+                    <strong className="text-red-400">{(marsConfig.km / 1_000_000).toFixed(1)} Million km</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">ONE-WAY LIGHT TIME</span>
+                    <strong className="text-amber-400">{marsConfig.oneWayMin} Minutes</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Display */}
+              <div className="text-center py-6 space-y-4">
+                {marsSimState === 'approaching' && (
+                  <div className="space-y-3">
+                    <div className="text-amber-300 font-mono text-sm flex items-center justify-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-amber-400 animate-pulse" />
+                      <span>HAZARD ALERT: Rover video frame shows steep cliff edge 3 meters ahead!</span>
+                    </div>
+                    <p className="text-xs text-slate-400 max-w-lg mx-auto">
+                      You are in NASA Mission Control on Earth. Click the emergency brake below to try and stop the rover!
+                    </p>
+                    <button
+                      onClick={handleSendMarsStop}
+                      className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold shadow-lg flex items-center gap-2 mx-auto"
+                    >
+                      <Send className="w-4 h-4" />
+                      TRANSMIT EMERGENCY BRAKE SIGNAL TO MARS
+                    </button>
+                  </div>
+                )}
+
+                {marsSimState === 'command_sent' && (
+                  <div className="space-y-3">
+                    <div className="text-amber-400 font-mono text-sm animate-pulse">
+                      📡 Radio wave en route across interplanetary space... ({marsElapsedSec}s elapsed / simulated {marsConfig.oneWayMin} min)
+                    </div>
+                    <div className="w-full max-w-md h-3 bg-slate-900 rounded-full mx-auto overflow-hidden border border-slate-800">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-400 to-red-500 transition-all duration-100"
+                        style={{ width: `${Math.min(100, (marsElapsedSec / 35) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {marsSimState === 'cliff_fallen' && (
+                  <div className="space-y-3 max-w-xl mx-auto">
+                    <div className="p-4 rounded-xl bg-red-950/80 border border-red-500 text-red-200 text-xs font-mono space-y-2 text-left">
+                      <div className="font-bold text-red-400 text-sm flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5 text-red-400" />
+                        TOO LATE! THE ROVER FELL OFF THE CLIFF {marsConfig.oneWayMin} MINUTES AGO!
+                      </div>
+                      <p>
+                        By the time Earth received the video frame showing the rover near the cliff, that frame was already <strong>{marsConfig.oneWayMin} minutes old</strong>.
+                        When you clicked the brake button, your signal took another <strong>{marsConfig.oneWayMin} minutes</strong> to arrive.
+                      </p>
+                      <p className="text-slate-300">
+                        At Mars average distance, that is an unbridgeable <strong>21-minute round trip</strong>. Human joystick control across interplanetary distances is fundamentally impossible!
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-3 pt-2">
+                      <button
+                        onClick={handleEnableAutoNav}
+                        className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold shadow-lg"
+                      >
+                        🤖 Turn ON Onboard NASA AutoNav AI
+                      </button>
+                      <button
+                        onClick={handleResetMars}
+                        className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs border border-slate-700"
+                        title="Reset"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {marsSimState === 'autonav_saved' && (
+                  <div className="space-y-3 max-w-xl mx-auto">
+                    <div className="p-4 rounded-xl bg-emerald-950/80 border border-emerald-500 text-emerald-200 text-xs font-mono space-y-2 text-left">
+                      <div className="font-bold text-emerald-400 text-sm">
+                        ✨ AUTONAV ENGAGED: ROVER SAVED AUTONOMOUSLY!
+                      </div>
+                      <p>
+                        Perseverance uses dual high-resolution Navcams and an onboard FPGA computer vision system that builds 3D terrain maps in real time.
+                        When AutoNav detected the crater drop-off 2 meters away, it stopped the steering actuators in <strong>0.1 seconds</strong> without waiting for Earth!
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleResetMars}
+                      className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs border border-slate-700"
+                    >
+                      Try Simulation Again
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- TAB 7: VOYAGER 1 PING --- */}
         {activeTab === 'voyager' && (
           <div className="space-y-4">
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
@@ -810,8 +1399,14 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
                   </div>
 
                   {voyagerPingProgress >= 100 && (
-                    <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-mono">
-                      ✨ Voyager 1 telemetry received! 23-Watt transmitter confirmation acknowledged.
+                    <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-mono space-y-3">
+                      <div>✨ Voyager 1 telemetry received! 23-Watt transmitter confirmation acknowledged.</div>
+                      <button
+                        onClick={resetVoyagerPing}
+                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs border border-slate-700"
+                      >
+                        Transmit Another Ping
+                      </button>
                     </div>
                   )}
                 </div>
@@ -843,7 +1438,9 @@ export default function LatencyArcade({ initialExhibitId }: LatencyArcadeProps) 
         metricHighlight={
           activeExhibit.roundTripMs < 1000
             ? `${activeExhibit.roundTripMs} ms`
-            : `${(activeExhibit.roundTripMs / 1000).toFixed(1)} seconds`
+            : activeExhibit.roundTripMs < 60_000
+            ? `${(activeExhibit.roundTripMs / 1000).toFixed(1)} seconds`
+            : `${(activeExhibit.roundTripMs / 60_000).toFixed(1)} minutes`
         }
         funFact={activeExhibit.plaqueFact}
         mathFormula={activeExhibit.mathFormula}

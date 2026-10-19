@@ -16,40 +16,43 @@ export default function FrameRateVault() {
   const [showStrobeGhost, setShowStrobeGhost] = useState<boolean>(false);
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
 
-  // Monitor Hz detection
+  // Monitor Hz detection with background tab immunity
   useEffect(() => {
-    let frameCount = 0;
-    let startTime = 0;
     let animId: number;
-    const deltas: number[] = [];
+    const validDeltas: number[] = [];
+    let lastT = 0;
 
     const detect = (time: number) => {
-      if (!startTime) startTime = time;
-      frameCount++;
-
-      if (deltas.length > 0) {
-        const dt = time - deltas[deltas.length - 1];
-        if (dt > 0 && dt < 100) {
-          // record frame time
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        animId = requestAnimationFrame(detect);
+        return;
+      }
+      if (lastT > 0) {
+        const dt = time - lastT;
+        // Accept valid consecutive frame intervals between 2ms (500Hz) and 45ms (22Hz)
+        if (dt >= 2 && dt <= 45) {
+          validDeltas.push(dt);
         }
       }
-      deltas.push(time);
+      lastT = time;
 
-      if (frameCount < 100) {
+      if (validDeltas.length < 60) {
         animId = requestAnimationFrame(detect);
       } else {
-        const totalElapsed = time - startTime;
-        const avgFrameMs = totalElapsed / frameCount;
+        const avgFrameMs = validDeltas.reduce((a, b) => a + b, 0) / validDeltas.length;
         const calculatedHz = Math.round(1000 / avgFrameMs);
 
         // Normalize to common hardware refresh rates
         let standardHz = calculatedHz;
-        if (Math.abs(calculatedHz - 60) <= 4) standardHz = 60;
-        else if (Math.abs(calculatedHz - 75) <= 4) standardHz = 75;
-        else if (Math.abs(calculatedHz - 90) <= 4) standardHz = 90;
-        else if (Math.abs(calculatedHz - 120) <= 6) standardHz = 120;
-        else if (Math.abs(calculatedHz - 144) <= 6) standardHz = 144;
-        else if (Math.abs(calculatedHz - 240) <= 8) standardHz = 240;
+        if (Math.abs(calculatedHz - 60) <= 5) standardHz = 60;
+        else if (Math.abs(calculatedHz - 75) <= 5) standardHz = 75;
+        else if (Math.abs(calculatedHz - 90) <= 5) standardHz = 90;
+        else if (Math.abs(calculatedHz - 120) <= 8) standardHz = 120;
+        else if (Math.abs(calculatedHz - 144) <= 8) standardHz = 144;
+        else if (Math.abs(calculatedHz - 165) <= 8) standardHz = 165;
+        else if (Math.abs(calculatedHz - 240) <= 12) standardHz = 240;
+        else if (Math.abs(calculatedHz - 360) <= 15) standardHz = 360;
+        else standardHz = Math.max(30, Math.min(360, calculatedHz));
 
         setDetectedHz(standardHz);
       }
@@ -86,13 +89,25 @@ export default function FrameRateVault() {
 
     let lastTime = 0;
 
+    const handleResize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     const render = (time: number) => {
       if (!lastTime) lastTime = time;
       const dt = Math.min((time - lastTime) / 1000, 0.1);
       lastTime = time;
 
-      const width = canvas.width;
-      const height = canvas.height;
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
 
       // Clear
       ctx.fillStyle = '#0a0d18';
@@ -212,7 +227,10 @@ export default function FrameRateVault() {
     };
 
     animId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animId);
+    };
   }, [isPlaying, speedMultiplier, showStrobeGhost, detectedHz]);
 
   return (

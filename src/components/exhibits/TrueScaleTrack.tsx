@@ -30,13 +30,23 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
 
   const [traveledDistanceMm, setTraveledDistanceMm] = useState<number>(0);
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
+  const [screenWidth, setScreenWidth] = useState<number>(1200);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const posXRef = useRef<number>(50);
   const posDualXRef = useRef<number>(50);
   const traveledMmRef = useRef<number>(0);
+  const lastChirpTimeRef = useRef<number>(0);
 
   const ppmm = calculatePpmm(ppi);
+
+  // Safe client-side screen width to avoid SSR hydration mismatch
+  useEffect(() => {
+    const updateWidth = () => setScreenWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   // When exhibit changes, adjust default zoom and slow-mo
   const selectExhibit = (exhibit: SpeedExhibit) => {
@@ -45,6 +55,7 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
     setZoomScale(exhibit.defaultZoom);
     setSlowMoScale(exhibit.defaultSlowMo);
     posXRef.current = 50;
+    posDualXRef.current = 50;
     traveledMmRef.current = 0;
     setTraveledDistanceMm(0);
   };
@@ -139,7 +150,11 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
 
         if (posXRef.current > finishX) {
           posXRef.current = trackPadding;
-          playPacket();
+          const nowMs = performance.now();
+          if (nowMs - lastChirpTimeRef.current > 300) {
+            playPacket();
+            lastChirpTimeRef.current = nowMs;
+          }
         }
       }
 
@@ -228,7 +243,7 @@ export default function TrueScaleTrack({ initialExhibitId }: TrueScaleTrackProps
 
   const transitTime = calculateScreenTransitTime(
     activeExhibit.speedMps,
-    typeof window !== 'undefined' ? window.innerWidth : 1200,
+    screenWidth,
     ppi
   );
 

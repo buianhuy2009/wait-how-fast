@@ -151,7 +151,7 @@ export default function CardCalibrator({ onComplete, isCompact = false }: CardCa
       )}
 
       {/* Interactive Card Canvas Arena */}
-      <div className="relative flex flex-col items-center justify-center p-8 bg-slate-950/60 rounded-xl border border-slate-800/80 overflow-hidden mb-6 min-h-[300px]">
+      <div className="relative flex flex-col items-center justify-center p-8 bg-slate-950/60 rounded-xl border border-slate-800/80 overflow-x-auto max-w-full mb-6 min-h-[300px]">
         {/* Subtle grid pattern background */}
         <div
           className="absolute inset-0 opacity-15 pointer-events-none"

@@ -20,6 +20,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
 
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [simulatedElapsedSec, setSimulatedElapsedSec] = useState<number>(0);
+  const [paceMode, setPaceMode] = useState<'fast' | 'real'>('fast');
   const [isShareOpen, setIsShareOpen] = useState<boolean>(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -49,12 +50,14 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
     setSimulatedElapsedSec(0);
 
     const stepMs = 50;
-    // For long operations (SSD, HDD, Network), we accelerate time so users don't have to wait 4 years!
+    // For long operations (SSD, HDD, Network), we accelerate time unless user explicitly chose literal 1:1 pace!
     let timeMultiplier = 1.0;
-    if (activeOp.dilatedSeconds > 3600) {
-      timeMultiplier = activeOp.dilatedSeconds / 6; // finishes in ~6 seconds
-    } else if (activeOp.dilatedSeconds > 60) {
-      timeMultiplier = activeOp.dilatedSeconds / 4; // finishes in ~4 seconds
+    if (paceMode === 'fast') {
+      if (activeOp.dilatedSeconds > 3600) {
+        timeMultiplier = activeOp.dilatedSeconds / 6; // finishes in ~6 seconds
+      } else if (activeOp.dilatedSeconds > 60) {
+        timeMultiplier = activeOp.dilatedSeconds / 4; // finishes in ~4 seconds
+      }
     }
 
     const interval = setInterval(() => {
@@ -218,7 +221,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
             </div>
 
             {/* Simulation Action Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={handleStartSimulation}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-xl transition-all ${
@@ -237,6 +240,22 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
                 title="Reset Simulation"
               >
                 <RotateCcw className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  playClick(850);
+                  setPaceMode(paceMode === 'fast' ? 'real' : 'fast');
+                  handleReset();
+                }}
+                className={`px-3 py-2.5 rounded-xl border text-xs font-mono transition-colors ${
+                  paceMode === 'real'
+                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold'
+                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                }`}
+                title="Toggle between Fast-Forward preview and Literal 1s=1ns real-time waiting"
+              >
+                {paceMode === 'real' ? '⏱️ Real 1ns=1s Pace' : '⏩ Fast-Forward'}
               </button>
             </div>
           </div>

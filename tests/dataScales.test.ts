@@ -31,7 +31,9 @@ test('PHYSICAL_ANALOGIES and DATA_SIZES have complete definitions for all sizes'
 
   const keys = ['1b', '1kb', '1mb', '1gb', '1tb', '1pb'];
   const analogyKeys = Object.keys(PHYSICAL_ANALOGIES);
-  assert.ok(analogyKeys.length >= 5);
+  assert.ok(analogyKeys.length >= 6);
+  assert.ok(PHYSICAL_ANALOGIES.lego);
+  assert.ok(PHYSICAL_ANALOGIES.lego.scales['1gb'].quantity.includes('1 Billion'));
 
   for (const aKey of analogyKeys) {
     const analogy = PHYSICAL_ANALOGIES[aKey];

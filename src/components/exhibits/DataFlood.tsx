@@ -38,7 +38,7 @@ export default function DataFlood({
 
   const throughput = calculateThroughput(ispSpeedMbps, gameSizeGb * 1000);
 
-  // Canvas Pipe Animation: 8 bits falling into 1 byte container
+  // Canvas Pipe Animation: 8 bits falling into 1 byte container with DPR scaling
   useEffect(() => {
     let animId: number;
     const canvas = canvasRef.current;
@@ -56,13 +56,28 @@ export default function DataFlood({
     const particles: Particle[] = [];
     let lastSpawn = 0;
 
+    const handleResize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     const loop = (time: number) => {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
+
       // Spawn bit particle
       if (time - lastSpawn > 250) {
         lastSpawn = time;
         bitAccumulatorRef.current = (bitAccumulatorRef.current + 1) % 8;
         particles.push({
-          x: canvas.width * 0.35 + (Math.random() - 0.5) * 16,
+          x: width * 0.35 + (Math.random() - 0.5) * 16,
           y: 20,
           vy: 3.5,
           bitIndex: bitAccumulatorRef.current,
@@ -70,17 +85,17 @@ export default function DataFlood({
       }
 
       ctx.fillStyle = '#0a0d18';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, width, height);
 
       // Pipe Glass Wall Outline
-      const pipeX = canvas.width * 0.35;
+      const pipeX = width * 0.35;
       const pipeW = 40;
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 2;
       ctx.strokeRect(pipeX - pipeW / 2, 10, pipeW, 110);
 
       // Byte Bucket at bottom
-      const bucketX = canvas.width * 0.7;
+      const bucketX = width * 0.7;
       const bucketW = 90;
       const bucketH = 70;
       const bucketY = 60;
@@ -141,7 +156,10 @@ export default function DataFlood({
     };
 
     animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animId);
+    };
   }, [playDrop]);
 
   const handleSizeChange = (id: string) => {
@@ -307,7 +325,7 @@ export default function DataFlood({
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
             STEP 2: SELECT PHYSICAL MATTER OBJECT
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {Object.values(PHYSICAL_ANALOGIES).map((analogy) => {
               const isSelected = selectedAnalogy.id === analogy.id;
               return (

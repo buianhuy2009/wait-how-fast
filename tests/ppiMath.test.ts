@@ -77,4 +77,18 @@ test('formatDuration formats all magnitude scales correctly', () => {
   assert.strictEqual(formatDuration(172800), '2.0 days');
   assert.strictEqual(formatDuration(86400 * 60), '2.0 months');
   assert.strictEqual(formatDuration(86400 * 730), '2.0 years');
+  assert.strictEqual(formatDuration(0), 'Instant');
+  assert.strictEqual(formatDuration(-10), 'Instant');
+  assert.strictEqual(formatDuration(Infinity), 'Instant');
+});
+
+test('calculateScreenTransitTime calculates nanosecond light transit accurately', () => {
+  const ppi = 96;
+  // Grace Hopper 11.8 inches = 11.8 * 96 px = 1132.8 px
+  const widthPx = 11.8 * ppi;
+  const lightSpeedMps = 299_792_458;
+  const result = calculateScreenTransitTime(lightSpeedMps, widthPx, ppi);
+  // ~1.0 nanosecond
+  assert.ok(Math.abs(result.seconds - 1e-9) < 0.05e-9);
+  assert.ok(result.formatted.includes('nanosecond'));
 });

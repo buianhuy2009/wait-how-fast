@@ -17,13 +17,13 @@ function ExhibitContent({ slug }: { slug: string }) {
 
   switch (slug) {
     case 'speed':
-      return <TrueScaleTrack initialExhibitId={exhibitParam} />;
+      return <TrueScaleTrack key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
     case 'latency':
-      return <LatencyArcade initialExhibitId={exhibitParam} />;
+      return <LatencyArcade key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
     case 'data':
-      return <DataFlood initialSizeId={sizeParam || '1gb'} initialAnalogyId={analogyParam || 'rice'} />;
+      return <DataFlood key={`${sizeParam || '1gb'}-${analogyParam || 'rice'}`} initialSizeId={sizeParam || '1gb'} initialAnalogyId={analogyParam || 'rice'} />;
     case 'cpu':
-      return <CpuTimeDilation initialOpId={exhibitParam || 'main-ram'} />;
+      return <CpuTimeDilation key={exhibitParam || 'default'} initialOpId={exhibitParam || 'main-ram'} />;
     case 'framerate':
       return <FrameRateVault />;
     default:

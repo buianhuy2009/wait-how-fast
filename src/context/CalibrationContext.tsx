@@ -62,15 +62,21 @@ function getStoredCalibrated(): boolean {
 function getStoredPreset(): string | null {
   if (typeof window === 'undefined') return 'standard-96';
   try {
-    return localStorage.getItem(STORAGE_KEY_PRESET) || 'standard-96';
+    const val = localStorage.getItem(STORAGE_KEY_PRESET);
+    if (val !== null) return val;
+    // If neither calibrated nor preset saved, default to standard-96
+    const isCal = localStorage.getItem(STORAGE_KEY_CALIBRATED);
+    const hasPpi = localStorage.getItem(STORAGE_KEY_PPI);
+    if (!isCal && !hasPpi) return 'standard-96';
+    return null;
   } catch {}
-  return 'standard-96';
+  return null;
 }
 
 export function CalibrationProvider({ children }: { children: React.ReactNode }) {
   const ppi = useSyncExternalStore(subscribe, getStoredPpi, () => DEFAULT_PPI);
   const isCalibrated = useSyncExternalStore(subscribe, getStoredCalibrated, () => false);
-  const activePresetId = useSyncExternalStore(subscribe, getStoredPreset, () => 'standard-96');
+  const activePresetId = useSyncExternalStore(subscribe, getStoredPreset, () => null);
 
   const [cardWidthOverride, setCardWidthOverride] = useState<number | null>(null);
   const cardWidthPx = cardWidthOverride ?? calculateCardWidthFromPpi(ppi);

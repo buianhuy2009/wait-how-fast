@@ -27,7 +27,7 @@ export default function ScreenRuler() {
         <div className="text-[11px] font-mono text-amber-300/80 mb-1">INCHES (1:1 TRUE PHYSICAL SCALE)</div>
         <div
           className="relative h-12 bg-amber-950/40 border-t-2 border-b-2 border-amber-500/60 rounded flex items-start select-none"
-          style={{ width: `${inchesCount * ppi}px` }}
+          style={{ width: `${inchesCount * ppi + 24}px` }}
         >
           {Array.from({ length: inchesCount + 1 }).map((_, inchIdx) => (
             <React.Fragment key={`inch-${inchIdx}`}>
@@ -86,7 +86,7 @@ export default function ScreenRuler() {
         <div className="text-[11px] font-mono text-cyan-300/80 mb-1">CENTIMETERS & MILLIMETERS (1:1 TRUE SCALE)</div>
         <div
           className="relative h-12 bg-cyan-950/40 border-t-2 border-b-2 border-cyan-500/60 rounded flex items-start select-none"
-          style={{ width: `${cmCount * 10 * ppmm}px` }}
+          style={{ width: `${cmCount * 10 * ppmm + 24}px` }}
         >
           {Array.from({ length: cmCount + 1 }).map((_, cmIdx) => (
             <React.Fragment key={`cm-${cmIdx}`}>

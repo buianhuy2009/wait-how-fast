@@ -7,7 +7,7 @@ export interface LatencyExhibit {
   distanceKm: number;
   category: 'terrestrial' | 'biological' | 'space' | 'interstellar';
   icon: string;
-  interactiveType: 'typing' | 'pong' | 'rover' | 'reflex' | 'voyager';
+  interactiveType: 'fiber' | 'typing' | 'pong' | 'rover' | 'mars' | 'reflex' | 'voyager';
   plaqueFact: string;
   detailedBreakdown: { label: string; timeMs: number; description: string }[];
   mathFormula: string;
@@ -25,7 +25,7 @@ export const LATENCY_EXHIBITS: LatencyExhibit[] = [
     distanceKm: 1000,
     category: 'terrestrial',
     icon: '💡',
-    interactiveType: 'typing',
+    interactiveType: 'fiber',
     plaqueFact: 'Light does NOT travel at 300,000 km/s on the internet. Because optical fiber is made of solid silica glass (refractive index n ≈ 1.468), light slows down by 31.8% to ~204,190 km/s! In 1 nanosecond, light in glass travels only 8 inches (20.4 cm).',
     detailedBreakdown: [
       { label: 'Speed of Light in Vacuum', timeMs: 3.33, description: '1000 km in pure vacuum: 3.33 ms' },
@@ -127,7 +127,7 @@ export const LATENCY_EXHIBITS: LatencyExhibit[] = [
     distanceKm: 189_000_000, // average distance
     category: 'space',
     icon: '🔴',
-    interactiveType: 'rover',
+    interactiveType: 'mars',
     plaqueFact: 'Depending on orbital positions, Mars is between 54.6 million km and 401 million km from Earth. One-way light travel takes 3 to 22 minutes (round trip: 6 to 45 minutes!). By the time NASA engineers see a video frame of a rover teetering on a cliff edge, the rover drove off it 10 minutes ago! That is why Mars rovers require onboard autonomous AI vision (AutoNav).',
     detailedBreakdown: [
       { label: 'Closest Approach (Perigee)', timeMs: 364_000, description: '54.6 million km = 3.03 minutes one-way (6.07 min RTT)' },
