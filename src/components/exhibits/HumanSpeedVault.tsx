@@ -92,6 +92,18 @@ const BIO_SPECIMENS: BioSpecimen[] = [
     formula: 't_blink = 100 - 150 ms (Spontaneous human blink kinesthesia)',
     citation: 'Schiffman, H. R., Sensation and Perception: An Integrated Approach',
   },
+  {
+    id: 'usain-bolt',
+    name: 'Usain Bolt Top Sprint Speed',
+    subtitle: 'Maximum Recorded Human Locomotion',
+    speedDisplay: '12.42 m/s (44.72 km/h / 27.78 mph)',
+    speedMps: 12.42,
+    icon: '🏃',
+    color: '#16a34a',
+    description: 'Between the 60m and 80m marks at the 2009 Berlin World Championships, Usain Bolt reached 44.72 km/h (12.42 m/s), setting the verified physical limit of human sprinting speed while generating over 2,600 watts of power.',
+    formula: 'v_peak = 12.42 m/s; P_max ≈ 2,619 W; 100m World Record = 9.58s',
+    citation: 'IAAF Biomechanical Research Project Berlin 2009',
+  },
 ];
 
 export default function HumanSpeedVault() {
@@ -155,7 +167,7 @@ export default function HumanSpeedVault() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
           {BIO_SPECIMENS.map((specimen) => {
             const isSelected = selectedSpecimen.id === specimen.id;
             return (

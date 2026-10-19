@@ -3,6 +3,8 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import TrueScaleTrack from '@/components/exhibits/TrueScaleTrack';
+import SoundVsLightShowdown from '@/components/exhibits/SoundVsLightShowdown';
+import AnimalSpeedOlympics from '@/components/exhibits/AnimalSpeedOlympics';
 import LatencyArcade from '@/components/exhibits/LatencyArcade';
 import DataFlood from '@/components/exhibits/DataFlood';
 import CpuTimeDilation from '@/components/exhibits/CpuTimeDilation';
@@ -19,7 +21,13 @@ function ExhibitContent({ slug }: { slug: string }) {
 
   switch (slug) {
     case 'speed':
-      return <TrueScaleTrack key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />;
+      return (
+        <div className="space-y-16">
+          <TrueScaleTrack key={exhibitParam || 'default'} initialExhibitId={exhibitParam} />
+          <SoundVsLightShowdown />
+          <AnimalSpeedOlympics />
+        </div>
+      );
     case 'biology':
       return <HumanSpeedVault key="biology" />;
     case 'latency':

@@ -134,10 +134,10 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                The CPU Time Dilation Chamber (1 Nanosecond = 1 Human Second)
+                Why Is Your Computer Waiting? (If 1 CPU Tick = 1 Human Second)
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Slowed down <strong>1,000,000,000&times;</strong> to reveal what your CPU does while waiting for data.
+                Slowed down <strong>1,000,000,000&times;</strong> to reveal why your CPU feels like it waits days or years for data.
               </p>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function CpuTimeDilation({ initialOpId = 'main-ram' }: CpuTimeDil
               <strong className="text-indigo-600 text-sm font-black">{activeOp.realTimeDisplay}</strong>
             </div>
             <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200">
-              <span className="text-purple-700 block text-[10px] font-bold">HUMAN DILATED TIME</span>
+              <span className="text-purple-700 block text-[10px] font-bold">DILATED HUMAN WAIT</span>
               <strong className="text-purple-950 text-sm font-black">{activeOp.dilatedDisplay}</strong>
             </div>
           </div>

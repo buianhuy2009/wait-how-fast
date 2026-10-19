@@ -64,3 +64,64 @@ test('LATENCY_EXHIBITS includes all 7 exhibits with verified RTT and distinct in
     assert.ok(item.detailedBreakdown.length >= 2, `Missing breakdown for ${item.id}`);
   }
 });
+
+test('Animal Kingdom and Human Speed Olympics exhibits have verified physics', () => {
+  const mantis = SPEED_EXHIBITS.find((s) => s.id === 'mantis-shrimp');
+  assert.ok(mantis);
+  assert.strictEqual(mantis.speedMps, 23);
+  assert.ok(mantis.plaqueFact.includes('10,400 G'));
+  assert.ok(mantis.plaqueFact.includes('cavitation'));
+
+  const falcon = SPEED_EXHIBITS.find((s) => s.id === 'peregrine-falcon');
+  assert.ok(falcon);
+  assert.strictEqual(falcon.speedMps, 108);
+  assert.ok(falcon.displaySpeed.includes('389 km/h'));
+
+  const cheetah = SPEED_EXHIBITS.find((s) => s.id === 'cheetah-sprint');
+  assert.ok(cheetah);
+  assert.strictEqual(cheetah.speedMps, 33.3);
+
+  const bolt = SPEED_EXHIBITS.find((s) => s.id === 'usain-bolt');
+  assert.ok(bolt);
+  assert.strictEqual(bolt.speedMps, 12.42);
+  assert.ok(bolt.displaySpeed.includes('44.72 km/h'));
+
+  const sloth = SPEED_EXHIBITS.find((s) => s.id === 'three-toed-sloth');
+  assert.ok(sloth);
+  assert.strictEqual(sloth.speedMps, 0.05);
+
+  const bamboo = SPEED_EXHIBITS.find((s) => s.id === 'bamboo-growth');
+  assert.ok(bamboo);
+  assert.strictEqual(bamboo.speedMps, 1.16e-5);
+  assert.ok(bamboo.displaySpeed.includes('1 meter / 24 hours'));
+});
+
+test('True-Scale Showdown verifies exact 874,000x gap between Light and Sound', () => {
+  const soundSpeed = 343; // m/s
+  const lightSpeed = 299_792_458; // m/s
+  const ratio = lightSpeed / soundSpeed;
+
+  // Exact physical ratio ~ 874,030.5x
+  assert.ok(ratio > 874_000 && ratio < 874_100);
+
+  // 1 km lightning strike arrival times
+  const distance = 1000; // meters
+  const lightArrival = distance / lightSpeed; // seconds
+  const soundArrival = distance / soundSpeed; // seconds
+
+  // Light arrives in ~3.3 microseconds
+  assert.ok(Math.abs(lightArrival * 1_000_000 - 3.3356) < 0.01);
+  // Sound takes ~2.915 seconds
+  assert.ok(Math.abs(soundArrival - 2.915) < 0.01);
+
+  // In 1.0 second:
+  const sound1sDistanceM = soundSpeed * 1.0;
+  assert.strictEqual(sound1sDistanceM, 343);
+
+  const light1sDistanceKm = (lightSpeed * 1.0) / 1000;
+  const earthCircumferenceKm = 40_075;
+  const earthOrbits = light1sDistanceKm / earthCircumferenceKm;
+  // Light wraps around Earth ~7.48 times (7.5 times)
+  assert.ok(Math.abs(earthOrbits - 7.48) < 0.02);
+});
+

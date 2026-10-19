@@ -245,6 +245,84 @@ class SoundEngine {
       // ignore
     }
   }
+
+  /**
+   * Lightning electric snap (high frequency crackle)
+   */
+  public playLightningSpark(): void {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(2400, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+
+      gain.gain.setValueAtTime(0.25 * this.volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } catch {
+      // ignore
+    }
+  }
+
+  /**
+   * Rolling thunder boom (deep low-frequency rumble with realistic tail)
+   */
+  public playThunderRumble(): void {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      // Multi-layer low frequency sub rumble
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(95, now);
+      osc1.frequency.exponentialRampToValueAtTime(35, now + 1.4);
+
+      osc2.type = 'sawtooth';
+      osc2.frequency.setValueAtTime(60, now);
+      osc2.frequency.exponentialRampToValueAtTime(28, now + 1.2);
+
+      // Low pass filter to create distant muffled thunder feel
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(140, now);
+      filter.frequency.exponentialRampToValueAtTime(50, now + 1.4);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.35 * this.volume, now + 0.06); // sudden crack
+      gain.gain.exponentialRampToValueAtTime(0.12 * this.volume, now + 0.5); // rolling rumble
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6); // fade out
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 1.6);
+      osc2.stop(now + 1.6);
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export const sound = new SoundEngine();

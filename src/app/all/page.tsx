@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
 import TrueScaleTrack from '@/components/exhibits/TrueScaleTrack';
+import SoundVsLightShowdown from '@/components/exhibits/SoundVsLightShowdown';
+import AnimalSpeedOlympics from '@/components/exhibits/AnimalSpeedOlympics';
 import HumanSpeedVault from '@/components/exhibits/HumanSpeedVault';
 import LatencyArcade from '@/components/exhibits/LatencyArcade';
 import DataFlood from '@/components/exhibits/DataFlood';
@@ -79,6 +80,12 @@ export default function GrandWalkthrough() {
           How Fast Things Actually Move
         </h2>
         <TrueScaleTrack />
+        <div className="pt-8">
+          <SoundVsLightShowdown />
+        </div>
+        <div className="pt-8">
+          <AnimalSpeedOlympics />
+        </div>
       </section>
 
       {/* Wing 2 */}

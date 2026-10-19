@@ -3,6 +3,8 @@
 import React from 'react';
 import PrintingMoneyStream from '@/components/museum/PrintingMoneyStream';
 import ContinuousSpeedConveyor from '@/components/exhibits/ContinuousSpeedConveyor';
+import SoundVsLightShowdown from '@/components/exhibits/SoundVsLightShowdown';
+import AnimalSpeedOlympics from '@/components/exhibits/AnimalSpeedOlympics';
 import DataPaperScale from '@/components/exhibits/DataPaperScale';
 import CpuPaperScale from '@/components/exhibits/CpuPaperScale';
 import ContinuousLatencyStream from '@/components/exhibits/ContinuousLatencyStream';
@@ -14,7 +16,7 @@ import { ArrowDown } from 'lucide-react';
 export default function MuseumWalkthrough() {
   return (
     <div className="w-full flex flex-col items-center">
-      {/* 1. Welcoming Hero Entrance (Zero buttons needed, pure scroll prompt) */}
+      {/* 1. Welcoming Hero Entrance */}
       <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20 sm:pt-36 sm:pb-32 text-center flex flex-col items-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium text-slate-500 bg-white border border-slate-200 mb-6 shadow-2xs">
           <span>Digital Science Museum</span>
@@ -70,22 +72,32 @@ export default function MuseumWalkthrough() {
         <ContinuousSpeedConveyor />
       </section>
 
-      {/* 4. Hall 03: The Scale of Data (Neal.fun / Paper style) */}
+      {/* 4. Special Feature: True-Scale Showdown (Sound vs. Light) */}
+      <section id="sound-vs-light" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+        <SoundVsLightShowdown />
+      </section>
+
+      {/* 5. Special Feature: The Animal Kingdom Speed Olympics */}
+      <section id="animal-olympics" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
+        <AnimalSpeedOlympics />
+      </section>
+
+      {/* 6. Hall 03: The Scale of Data (Neal.fun / Paper style with rich SVG illustrations) */}
       <section id="data-scale" className="w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <DataPaperScale />
       </section>
 
-      {/* 5. Hall 04: Inside Your CPU (Neal.fun / Paper style) */}
+      {/* 7. Hall 04: Inside Your CPU (Why Is Your Computer Waiting?) */}
       <section id="cpu-dilation" className="w-full max-w-5xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <CpuPaperScale />
       </section>
 
-      {/* 6. Hall 05: Speed of Light & The Latency Arena */}
+      {/* 8. Hall 05: Speed of Light & The Latency Arena */}
       <section id="latency-arena" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <ContinuousLatencyStream />
       </section>
 
-      {/* 7. Hall 06: Refresh & Frame Rate Vault */}
+      {/* 9. Hall 06: Refresh & Frame Rate Vault */}
       <section id="framerate-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
@@ -101,7 +113,7 @@ export default function MuseumWalkthrough() {
         <FrameRateVault />
       </section>
 
-      {/* 8. Hall 07: The Speed of You (Human Biology) */}
+      {/* 10. Hall 07: The Speed of You (Human Biology) */}
       <section id="human-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">
@@ -117,7 +129,7 @@ export default function MuseumWalkthrough() {
         <HumanSpeedVault />
       </section>
 
-      {/* 9. Hall 08: The Cosmic Vault */}
+      {/* 11. Hall 08: The Cosmic Vault */}
       <section id="cosmic-vault" className="w-full max-w-6xl px-4 sm:px-6 py-20 sm:py-32 border-t border-slate-200">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">

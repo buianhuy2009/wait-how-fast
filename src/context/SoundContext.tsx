@@ -13,6 +13,8 @@ interface SoundContextType {
   playCpu: () => void;
   playChime: () => void;
   playBuzz: () => void;
+  playLightning: () => void;
+  playThunder: () => void;
 }
 
 const SoundContext = createContext<SoundContextType | null>(null);
@@ -64,6 +66,8 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
   const playCpu = useCallback(() => sound.playCpuTick(), []);
   const playChime = useCallback(() => sound.playChime(), []);
   const playBuzz = useCallback(() => sound.playWarningBuzz(), []);
+  const playLightning = useCallback(() => sound.playLightningSpark(), []);
+  const playThunder = useCallback(() => sound.playThunderRumble(), []);
 
   return (
     <SoundContext.Provider
@@ -77,6 +81,8 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
         playCpu,
         playChime,
         playBuzz,
+        playLightning,
+        playThunder,
       }}
     >
       {children}

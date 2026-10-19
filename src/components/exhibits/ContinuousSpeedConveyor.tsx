@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useCalibration } from '@/context/CalibrationContext';
 import { useSound } from '@/context/SoundContext';
 import { calculatePpmm, velocityToPxPerSec } from '@/lib/ppiMath';
 import { FAMILIAR_OBJECTS } from '@/lib/familiarObjects';
+import { AlertCircle, ArrowDown } from 'lucide-react';
 
 interface ConveyorItem {
   id: string;
@@ -14,79 +15,194 @@ interface ConveyorItem {
   icon: string;
   accentColor: string;
   comparisonNote: string;
-  category: string;
+  category: 'highlights' | 'animals' | 'physics';
 }
 
-const CONVEYOR_ITEMS: ConveyorItem[] = [
+const ALL_CONVEYOR_ITEMS: ConveyorItem[] = [
+  // Highlights
   {
     id: 'hair-growth',
     name: 'Scalp Hair Growth',
-    speedMps: 4.75e-9, // 4.75 nm/s
+    speedMps: 4.75e-9,
     displaySpeed: '4.75 nm / sec',
     icon: '💇',
     accentColor: '#d97706',
-    comparisonNote: '0.5 mm synthesized every second across all scalp follicles.',
-    category: 'Microscopic',
+    comparisonNote: '0.5 mm synthesized every second across scalp.',
+    category: 'highlights',
   },
   {
     id: 'garden-snail',
     name: 'Garden Snail',
-    speedMps: 0.0013, // 1.3 mm/s
+    speedMps: 0.0013,
     displaySpeed: '1.3 mm / sec',
     icon: '🐌',
     accentColor: '#65a30d',
-    comparisonNote: 'Takes 2 minutes to crawl the length of a dollar bill.',
-    category: 'Creeping',
+    comparisonNote: 'Takes 2 minutes to crawl a dollar bill.',
+    category: 'highlights',
   },
   {
     id: '3d-printer',
     name: '3D Printer Nozzle',
-    speedMps: 0.25, // 250 mm/s
+    speedMps: 0.25,
     displaySpeed: '250 mm / sec',
     icon: '🖨️',
     accentColor: '#0891b2',
-    comparisonNote: 'Crosses your entire monitor screen in ~1 second.',
-    category: 'Mechanical',
+    comparisonNote: 'Crosses your monitor in ~1 second.',
+    category: 'highlights',
   },
   {
     id: 'aorta-blood',
     name: 'Aorta Blood Surge',
-    speedMps: 1.2, // 1.2 m/s
+    speedMps: 1.2,
     displaySpeed: '1.2 m / sec (2.7 mph)',
     icon: '❤️',
     accentColor: '#dc2626',
-    comparisonNote: 'Systolic pulse surging from your heart to your brain.',
-    category: 'Biological',
+    comparisonNote: 'Systolic pulse surging to your brain.',
+    category: 'highlights',
   },
   {
     id: 'cheetah-sprint',
     name: 'Cheetah Top Sprint',
-    speedMps: 29.0, // 29 m/s (65 mph)
-    displaySpeed: '29 m / sec (65 mph)',
+    speedMps: 33.3,
+    displaySpeed: '33.3 m / sec (75 mph)',
     icon: '🐆',
     accentColor: '#ca8a04',
-    comparisonNote: 'Crosses a 100-meter field in 3.4 seconds.',
-    category: 'Terrestrial',
+    comparisonNote: 'Crosses 100m in 3.0 seconds flat.',
+    category: 'highlights',
   },
   {
     id: 'speed-of-sound',
     name: 'Speed of Sound',
-    speedMps: 343.0, // 343 m/s
+    speedMps: 343.0,
     displaySpeed: '343 m / sec (Mach 1)',
     icon: '🔊',
     accentColor: '#2563eb',
-    comparisonNote: 'Sweeps across your monitor in 0.8 milliseconds.',
-    category: 'Acoustic',
+    comparisonNote: 'Crosses screen in 0.8 milliseconds.',
+    category: 'highlights',
   },
   {
     id: 'speed-of-light',
     name: 'Speed of Light (c)',
-    speedMps: 299_792_458, // 300,000 km/s
+    speedMps: 299_792_458,
     displaySpeed: '300,000 km / sec',
     icon: '💡',
     accentColor: '#9333ea',
-    comparisonNote: 'Travels 11.8 inches (width of this screen) in 1 nanosecond.',
-    category: 'Cosmic Limit',
+    comparisonNote: 'Cosmic limit (shown compressed on belt; see true scale below).',
+    category: 'highlights',
+  },
+
+  // Animal Kingdom additions
+  {
+    id: 'bamboo-growth',
+    name: 'Bamboo Growth',
+    speedMps: 1.16e-5,
+    displaySpeed: '11.6 µm / sec',
+    icon: '🎋',
+    accentColor: '#059669',
+    comparisonNote: 'Fastest growing plant on Earth (1m / day).',
+    category: 'animals',
+  },
+  {
+    id: 'sloth',
+    name: 'Garden Sloth Crawl',
+    speedMps: 0.05,
+    displaySpeed: '0.05 m / sec (0.11 mph)',
+    icon: '🦥',
+    accentColor: '#84cc16',
+    comparisonNote: 'Takes 6 seconds to crawl 1 foot.',
+    category: 'animals',
+  },
+  {
+    id: 'usain-bolt',
+    name: 'Usain Bolt Peak Sprint',
+    speedMps: 12.42,
+    displaySpeed: '12.42 m / sec (27.8 mph)',
+    icon: '🏃',
+    accentColor: '#16a34a',
+    comparisonNote: 'Fastest recorded human in history.',
+    category: 'animals',
+  },
+  {
+    id: 'mantis-shrimp',
+    name: 'Mantis Shrimp Strike',
+    speedMps: 23.0,
+    displaySpeed: '23 m / sec (10,400 G)',
+    icon: '🦐',
+    accentColor: '#ea580c',
+    comparisonNote: 'Accelerates like a .22 bullet, vaporizing water.',
+    category: 'animals',
+  },
+  {
+    id: 'cheetah-animal',
+    name: 'Cheetah Maximum Sprint',
+    speedMps: 33.3,
+    displaySpeed: '33.3 m / sec (75 mph)',
+    icon: '🐆',
+    accentColor: '#ca8a04',
+    comparisonNote: 'Accelerates 0 to 60 mph in 3 seconds.',
+    category: 'animals',
+  },
+  {
+    id: 'peregrine-falcon',
+    name: 'Peregrine Falcon Dive',
+    speedMps: 108.0,
+    displaySpeed: '108 m / sec (242 mph)',
+    icon: '🦅',
+    accentColor: '#0284c7',
+    comparisonNote: 'Fastest creature on Earth in stoop dive.',
+    category: 'animals',
+  },
+
+  // Physics & Cosmic
+  {
+    id: 'continental-drift',
+    name: 'Continental Drift',
+    speedMps: 7.92e-10,
+    displaySpeed: '0.79 nm / sec (2.5 cm/yr)',
+    icon: '🌍',
+    accentColor: '#10b981',
+    comparisonNote: 'Mid-Atlantic ridge tectonic separation.',
+    category: 'physics',
+  },
+  {
+    id: 'sound-wave',
+    name: 'Sound Wave (20°C)',
+    speedMps: 343.0,
+    displaySpeed: '343 m / sec (Mach 1)',
+    icon: '🔊',
+    accentColor: '#2563eb',
+    comparisonNote: 'Sweeps across monitor in 0.8 ms.',
+    category: 'physics',
+  },
+  {
+    id: 'earth-sun-orbit',
+    name: 'Earth Orbiting Sun',
+    speedMps: 29_780,
+    displaySpeed: '29.78 km / sec (66,600 mph)',
+    icon: '☀️',
+    accentColor: '#38bdf8',
+    comparisonNote: 'Travels 30 km every single second right now.',
+    category: 'physics',
+  },
+  {
+    id: 'parker-probe',
+    name: 'Parker Solar Probe',
+    speedMps: 176_000,
+    displaySpeed: '176 km / sec (394,000 mph)',
+    icon: '🛰️',
+    accentColor: '#f59e0b',
+    comparisonNote: 'Fastest human-made object in history.',
+    category: 'physics',
+  },
+  {
+    id: 'light-vacuum',
+    name: 'Light in Vacuum (c)',
+    speedMps: 299_792_458,
+    displaySpeed: '300,000 km / sec',
+    icon: '💡',
+    accentColor: '#9333ea',
+    comparisonNote: 'Universal speed limit (874,000x faster than sound).',
+    category: 'physics',
   },
 ];
 
@@ -95,6 +211,7 @@ export default function ContinuousSpeedConveyor() {
   const { playClick } = useSound();
   const ppmm = calculatePpmm(ppi);
 
+  const [activeTab, setActiveTab] = useState<'highlights' | 'animals' | 'physics'>('highlights');
   const [motionMode, setMotionMode] = useState<'observable' | 'literal'>('observable');
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -103,14 +220,18 @@ export default function ContinuousSpeedConveyor() {
   const heartbeatPhaseRef = useRef<number>(0);
   const beltTreadPhaseRef = useRef<number>(0);
 
-  // Initialize staggered positions
+  const currentItems = useMemo(() => {
+    return ALL_CONVEYOR_ITEMS.filter((item) => item.category === activeTab);
+  }, [activeTab]);
+
+  // Initialize positions
   useEffect(() => {
-    CONVEYOR_ITEMS.forEach((item, index) => {
+    currentItems.forEach((item, index) => {
       if (animPositionsRef.current[item.id] === undefined) {
         animPositionsRef.current[item.id] = (index * 90) % 500;
       }
     });
-  }, []);
+  }, [currentItems]);
 
   // Main Canvas Render Loop
   useEffect(() => {
@@ -147,17 +268,16 @@ export default function ContinuousSpeedConveyor() {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, width, height);
 
-      const numTracks = CONVEYOR_ITEMS.length;
+      const numTracks = currentItems.length;
       const trackHeight = height / numTracks;
 
-      // Responsive label column width on the left
       const isMobile = width < 640;
       const labelColWidth = isMobile ? 120 : 210;
       const conveyorLeft = labelColWidth + 12;
       const conveyorRight = width - 16;
       const conveyorActiveWidth = Math.max(100, conveyorRight - conveyorLeft);
 
-      CONVEYOR_ITEMS.forEach((item, idx) => {
+      currentItems.forEach((item, idx) => {
         const trackY = idx * trackHeight;
         const centerY = trackY + trackHeight / 2;
 
@@ -169,7 +289,7 @@ export default function ContinuousSpeedConveyor() {
         ctx.lineTo(width, trackY + trackHeight);
         ctx.stroke();
 
-        // Left Label Column (Fixed area, never covered by moving items)
+        // Left Label Column
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, trackY + 2, labelColWidth, trackHeight - 4);
 
@@ -186,7 +306,7 @@ export default function ContinuousSpeedConveyor() {
         ctx.fillStyle = item.accentColor;
         ctx.fillText(item.displaySpeed, 12, trackY + 32);
 
-        // Category / Note (hidden on narrow screens to keep it uncluttered)
+        // Category / Note
         if (!isMobile) {
           ctx.font = 'normal 10px ui-sans-serif, system-ui, sans-serif';
           ctx.fillStyle = '#64748b';
@@ -197,7 +317,7 @@ export default function ContinuousSpeedConveyor() {
           ctx.fillText(truncatedNote, 12, trackY + 48);
         }
 
-        // Vertical divider between label column and conveyor belt
+        // Vertical divider
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -205,7 +325,7 @@ export default function ContinuousSpeedConveyor() {
         ctx.lineTo(labelColWidth, trackY + trackHeight - 4);
         ctx.stroke();
 
-        // Conveyor Belt Bed (Sell! Sell! Sell! mechanical aesthetic)
+        // Conveyor Belt Bed
         const beltY = centerY - 18;
         const beltH = 36;
         ctx.fillStyle = idx % 2 === 0 ? '#f8fafc' : '#f1f5f9';
@@ -217,7 +337,7 @@ export default function ContinuousSpeedConveyor() {
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Moving Conveyor Tread Pattern (Sell! Sell! Sell! style)
+        // Moving Conveyor Tread Pattern
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1.5;
         const treadSpacing = 16;
@@ -238,39 +358,36 @@ export default function ContinuousSpeedConveyor() {
         }
         ctx.restore();
 
-        // Calculate velocity for this track
+        // Calculate velocity
         let pxPerSec = 0;
         if (motionMode === 'literal') {
           pxPerSec = velocityToPxPerSec(item.speedMps, ppi, 1.0, 1.0);
           if (pxPerSec > 2200) pxPerSec = 2200;
         } else {
-          // Observable View: calibrated so all speeds are distinct yet eye-trackable
-          switch (item.id) {
-            case 'hair-growth':
-              pxPerSec = 10;
-              break;
-            case 'garden-snail':
-              pxPerSec = Math.max(18, item.speedMps * 1000 * ppmm * 4);
-              break;
-            case '3d-printer':
-              pxPerSec = 130;
-              break;
-            case 'aorta-blood': {
-              const pulse = Math.pow(Math.max(0, Math.sin(heartbeatPhaseRef.current)), 4);
-              pxPerSec = 70 + pulse * 260;
-              break;
-            }
-            case 'cheetah-sprint':
-              pxPerSec = 340;
-              break;
-            case 'speed-of-sound':
-              pxPerSec = 700;
-              break;
-            case 'speed-of-light':
-              pxPerSec = 1400;
-              break;
-            default:
-              pxPerSec = 120;
+          // Observable View
+          if (item.speedMps < 1e-4) {
+            pxPerSec = 10;
+          } else if (item.speedMps < 0.01) {
+            pxPerSec = 25;
+          } else if (item.speedMps < 0.1) {
+            pxPerSec = 50;
+          } else if (item.speedMps < 1.0) {
+            pxPerSec = 120;
+          } else if (item.speedMps < 2.0) {
+            const pulse = Math.pow(Math.max(0, Math.sin(heartbeatPhaseRef.current)), 4);
+            pxPerSec = 80 + pulse * 240;
+          } else if (item.speedMps < 15.0) {
+            pxPerSec = 220; // Usain Bolt
+          } else if (item.speedMps < 25.0) {
+            pxPerSec = 290; // Mantis Shrimp
+          } else if (item.speedMps < 40.0) {
+            pxPerSec = 380; // Cheetah
+          } else if (item.speedMps < 150.0) {
+            pxPerSec = 520; // Falcon
+          } else if (item.speedMps < 1000.0) {
+            pxPerSec = 750; // Sound
+          } else {
+            pxPerSec = 1400; // Cosmic / Light
           }
         }
 
@@ -283,30 +400,21 @@ export default function ContinuousSpeedConveyor() {
 
         const objectX = conveyorLeft + 12 + currentPos;
 
-        // Visual FX for specific items
-        if (item.id === 'garden-snail') {
-          // Slime trail left by snail on conveyor
+        // Custom visual trails
+        if (item.id === 'garden-snail' || item.id === 'sloth') {
           ctx.strokeStyle = 'rgba(101, 163, 13, 0.4)';
           ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.moveTo(conveyorLeft + 10, centerY + 6);
           ctx.lineTo(objectX, centerY + 6);
           ctx.stroke();
-        } else if (item.id === '3d-printer') {
-          // Extruded molten filament line
-          ctx.strokeStyle = 'rgba(8, 145, 178, 0.5)';
-          ctx.lineWidth = 2;
+        } else if (item.id === 'mantis-shrimp') {
+          // Cavitation bubble flash
+          ctx.fillStyle = 'rgba(234, 88, 12, 0.3)';
           ctx.beginPath();
-          ctx.moveTo(conveyorLeft + 10, centerY + 4);
-          ctx.lineTo(objectX, centerY + 4);
-          ctx.stroke();
-        } else if (item.id === 'aorta-blood') {
-          // Systolic arterial pulse glow
-          ctx.fillStyle = 'rgba(220, 38, 38, 0.2)';
-          ctx.beginPath();
-          ctx.ellipse(objectX, centerY, 22, 12, 0, 0, Math.PI * 2);
+          ctx.arc(objectX, centerY, 18, 0, Math.PI * 2);
           ctx.fill();
-        } else if (item.id === 'speed-of-light') {
+        } else if (item.id === 'speed-of-light' || item.id === 'light-vacuum') {
           // Laser beam streak
           const beamLen = 70;
           const grad = ctx.createLinearGradient(objectX - beamLen, centerY, objectX, centerY);
@@ -316,7 +424,7 @@ export default function ContinuousSpeedConveyor() {
           ctx.fillRect(Math.max(conveyorLeft, objectX - beamLen), centerY - 2, beamLen, 4);
         }
 
-        // Render moving object emoji on the conveyor
+        // Emoji
         ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -331,10 +439,10 @@ export default function ContinuousSpeedConveyor() {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
     };
-  }, [motionMode, ppi, ppmm]);
+  }, [currentItems, motionMode, ppi, ppmm]);
 
   return (
-    <div className="w-full bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs">
+    <div className="w-full bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
       {/* Header & Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
         <div>
@@ -380,9 +488,71 @@ export default function ContinuousSpeedConveyor() {
         </div>
       </div>
 
-      {/* The 7 Conveyor Belts Canvas (Generous height, clean lanes, no text collisions) */}
-      <div className="w-full h-[520px] sm:h-[560px] my-6 rounded-2xl overflow-hidden border border-slate-200 bg-white relative">
+      {/* Category Tabs: Highlights vs Animals vs Physics */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => {
+            playClick(800);
+            setActiveTab('highlights');
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === 'highlights'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          ⭐ Key Highlights ({ALL_CONVEYOR_ITEMS.filter((i) => i.category === 'highlights').length})
+        </button>
+        <button
+          onClick={() => {
+            playClick(800);
+            setActiveTab('animals');
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === 'animals'
+              ? 'bg-emerald-600 text-white shadow-2xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          🐾 Animal Kingdom ({ALL_CONVEYOR_ITEMS.filter((i) => i.category === 'animals').length})
+        </button>
+        <button
+          onClick={() => {
+            playClick(800);
+            setActiveTab('physics');
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === 'physics'
+              ? 'bg-purple-600 text-white shadow-2xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          🌌 Cosmic & Physics ({ALL_CONVEYOR_ITEMS.filter((i) => i.category === 'physics').length})
+        </button>
+      </div>
+
+      {/* The Conveyor Belts Canvas */}
+      <div className="w-full h-[540px] sm:h-[580px] my-4 rounded-2xl overflow-hidden border border-slate-200 bg-white relative">
         <canvas ref={canvasRef} className="w-full h-full block" />
+      </div>
+
+      {/* Scale Callout: Why Sound vs. Light needs a special showdown */}
+      <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 font-medium">
+        <div className="flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <strong className="block font-bold">Important Physics Scale Note:</strong>
+            On this conveyor belt, the Speed of Light is displayed compressed so it doesn&apos;t flash past your monitor invisibly. In honest physics, Light is{' '}
+            <strong>874,030.5&times; faster than Sound</strong>!
+          </div>
+        </div>
+        <a
+          href="#sound-vs-light"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-200/80 hover:bg-amber-200 text-amber-950 font-bold shrink-0 self-start sm:self-auto transition-colors"
+        >
+          <span>See True-Scale Showdown</span>
+          <ArrowDown className="w-3.5 h-3.5" />
+        </a>
       </div>
 
       {/* Everyday Object Reference Line Below Conveyor */}
